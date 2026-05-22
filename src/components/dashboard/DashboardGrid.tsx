@@ -17,7 +17,7 @@ import { AddWidgetMenu } from "./AddWidgetMenu";
 const GRID_COLS = 8;
 
 export function DashboardGrid() {
-  const { widgets, updateWidget } = useWidgetStore();
+  const { widgets, reorderWidgets } = useWidgetStore();
   const [isEditing, setIsEditing] = useState(false);
 
   const sensors = useSensors(
@@ -32,13 +32,7 @@ export function DashboardGrid() {
     const newIndex = widgets.findIndex((w) => w.id === over.id);
 
     const reordered = arrayMove(widgets, oldIndex, newIndex);
-    reordered.forEach((w, i) => {
-      const col = (i * 2) % GRID_COLS;
-      const row = Math.floor((i * 2) / GRID_COLS);
-      if (w.col !== col || w.row !== row) {
-        updateWidget(w.id, { col, row });
-      }
-    });
+    reorderWidgets(reordered.map((w) => w.id));
   }
 
   return (

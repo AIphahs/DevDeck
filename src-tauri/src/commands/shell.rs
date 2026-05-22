@@ -3,6 +3,7 @@ use std::process::Stdio;
 use tokio::process::Command;
 
 #[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct CommandRequest {
     pub shell: ShellType,
     pub command: String,
@@ -18,6 +19,7 @@ pub enum ShellType {
 }
 
 #[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct CommandOutput {
     pub stdout: String,
     pub stderr: String,

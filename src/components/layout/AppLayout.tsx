@@ -1,7 +1,7 @@
-import { useUIStore } from "@/store/uiStore";
 import { Sidebar } from "./Sidebar";
 import { Topbar } from "./Topbar";
 import { MainContent } from "./MainContent";
+import { OutputPanel } from "@/components/shared/OutputPanel";
 
 export function AppLayout() {
   return (
@@ -11,6 +11,7 @@ export function AppLayout() {
         <Topbar />
         <MainContent />
       </div>
+      <OutputPanel />
     </div>
   );
 }

@@ -8,6 +8,7 @@ interface WidgetState {
   addWidget: (widget: Omit<Widget, "id">) => void;
   updateWidget: (id: string, updates: Partial<Widget>) => void;
   removeWidget: (id: string) => void;
+  reorderWidgets: (orderedIds: string[]) => void;
   moveWidget: (id: string, col: number, row: number) => void;
   resizeWidget: (id: string, colSpan: number, rowSpan: number) => void;
 }
@@ -33,6 +34,13 @@ export const useWidgetStore = create<WidgetState>()(
 
       removeWidget: (id) =>
         set((s) => ({ widgets: s.widgets.filter((w) => w.id !== id) })),
+
+      reorderWidgets: (orderedIds) =>
+        set((s) => ({
+          widgets: orderedIds
+            .map((id) => s.widgets.find((w) => w.id === id))
+            .filter((w): w is Widget => w !== undefined),
+        })),
 
       moveWidget: (id, col, row) =>
         set((s) => ({

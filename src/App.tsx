@@ -1,11 +1,11 @@
 import { useEffect } from "react";
-import { useThemeStore } from "@/store/themeStore";
+import { useThemeStore, applyAccentColor } from "@/store/themeStore";
 import { useProfileStore } from "@/store/profileStore";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { generateId } from "@/utils/format";
 
 export default function App() {
-  const { theme } = useThemeStore();
+  const { theme, accentColor } = useThemeStore();
   const { profiles, activeProfileId, addProfile, setActiveProfile } = useProfileStore();
 
   // Bootstrap a default profile on first launch
@@ -27,6 +27,10 @@ export default function App() {
       setActiveProfile(profiles[0].id);
     }
   }, []);
+
+  useEffect(() => {
+    applyAccentColor(accentColor);
+  }, [accentColor]);
 
   useEffect(() => {
     const root = document.documentElement;

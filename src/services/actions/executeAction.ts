@@ -1,6 +1,7 @@
 import type { Button } from "@/types";
 import { executeCommand } from "@/services/tauri/shell";
 import { open } from "@tauri-apps/plugin-shell";
+import { useOutputStore } from "@/store/outputStore";
 
 export async function executeAction(button: Button): Promise<void> {
   const { actionType, actionData } = button;
@@ -9,7 +10,14 @@ export async function executeAction(button: Button): Promise<void> {
     case "command": {
       const shell = (actionData.shell as string) ?? "powershell";
       const command = actionData.command as string;
-      await executeCommand({ shell: shell as never, command });
+      const { addEntry, updateEntry } = useOutputStore.getState();
+      const id = addEntry({ label: button.label, command, stdout: "", stderr: "", exitCode: null, status: "running" });
+      try {
+        const output = await executeCommand({ shell: shell as never, command });
+        updateEntry(id, { stdout: output.stdout, stderr: output.stderr, exitCode: output.exitCode, status: output.exitCode === 0 ? "success" : "error" });
+      } catch (err) {
+        updateEntry(id, { stderr: String(err), exitCode: -1, status: "error" });
+      }
       break;
     }
 
@@ -21,7 +29,14 @@ export async function executeAction(button: Button): Promise<void> {
 
     case "app": {
       const path = actionData.path as string;
-      await executeCommand({ shell: "powershell", command: `Start-Process "${path}"` });
+      const { addEntry, updateEntry } = useOutputStore.getState();
+      const id = addEntry({ label: button.label, command: path, stdout: "", stderr: "", exitCode: null, status: "running" });
+      try {
+        const output = await executeCommand({ shell: "powershell", command: `Start-Process "${path}"` });
+        updateEntry(id, { stdout: output.stdout, stderr: output.stderr, exitCode: output.exitCode, status: output.exitCode === 0 ? "success" : "error" });
+      } catch (err) {
+        updateEntry(id, { stderr: String(err), exitCode: -1, status: "error" });
+      }
       break;
     }
 

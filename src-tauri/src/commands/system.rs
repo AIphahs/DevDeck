@@ -2,6 +2,7 @@ use serde::Serialize;
 use sysinfo::System;
 
 #[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct SystemInfo {
     pub cpu_usage: f32,
     pub ram_used: u64,
@@ -13,6 +14,7 @@ pub struct SystemInfo {
 }
 
 #[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ProcessInfo {
     pub pid: u32,
     pub name: String,
