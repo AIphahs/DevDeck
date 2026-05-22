@@ -1,10 +1,32 @@
 import { useEffect } from "react";
 import { useThemeStore } from "@/store/themeStore";
-import { useUIStore } from "@/store/uiStore";
+import { useProfileStore } from "@/store/profileStore";
 import { AppLayout } from "@/components/layout/AppLayout";
+import { generateId } from "@/utils/format";
 
 export default function App() {
   const { theme } = useThemeStore();
+  const { profiles, activeProfileId, addProfile, setActiveProfile } = useProfileStore();
+
+  // Bootstrap a default profile on first launch
+  useEffect(() => {
+    if (profiles.length === 0) {
+      const profileId = generateId();
+      const pageId = generateId();
+      const defaultProfile = {
+        id: profileId,
+        name: "Default",
+        isActive: true,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        pages: [{ id: pageId, profileId, name: "Page 1", position: 0, buttons: [] }],
+      };
+      addProfile(defaultProfile);
+      setActiveProfile(profileId);
+    } else if (!activeProfileId) {
+      setActiveProfile(profiles[0].id);
+    }
+  }, []);
 
   useEffect(() => {
     const root = document.documentElement;

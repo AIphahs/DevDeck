@@ -1,7 +1,9 @@
 import { cn } from "@/utils/cn";
 import { useUIStore } from "@/store/uiStore";
+import { ProfileSelector } from "@/components/shared/ProfileSelector";
 import {
   LayoutDashboard,
+  Layers,
   Terminal,
   Music2,
   Activity,
@@ -15,6 +17,7 @@ import {
 
 const NAV_ITEMS = [
   { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { id: "deck", label: "Deck", icon: Layers },
   { id: "terminal", label: "Terminal", icon: Terminal },
   { id: "git", label: "Git", icon: GitBranch },
   { id: "docker", label: "Docker", icon: Container },
@@ -45,6 +48,11 @@ export function Sidebar() {
         {!isSidebarCollapsed && (
           <span className="font-semibold text-sm tracking-wide">DevDeck</span>
         )}
+      </div>
+
+      {/* Profile selector */}
+      <div className={cn("px-2 py-2 border-b border-border", isSidebarCollapsed && "flex justify-center")}>
+        <ProfileSelector collapsed={isSidebarCollapsed} />
       </div>
 
       {/* Navigation */}

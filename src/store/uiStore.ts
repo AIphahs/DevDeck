@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-type ActivePanel = "dashboard" | "terminal" | "soundboard" | "monitoring" | "git" | "docker" | "settings" | "plugins" | "ai";
+type ActivePanel = "dashboard" | "deck" | "terminal" | "soundboard" | "monitoring" | "git" | "docker" | "settings" | "plugins" | "ai";
 
 interface UIState {
   activePanel: ActivePanel;
