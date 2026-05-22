@@ -1,0 +1,14 @@
+{
+  "identifier": "default",
+  "description": "Default capabilities for DevDeck",
+  "windows": ["main"],
+  "permissions": [
+    "core:default",
+    "shell:allow-open",
+    "notification:default",
+    "os:default",
+    "process:default",
+    "global-shortcut:default",
+    "store:default"
+  ]
+}

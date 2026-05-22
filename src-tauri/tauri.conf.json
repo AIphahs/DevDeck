@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "identifier": "com.devdeck.app",
   "build": {
-    "beforeDevCommand": "npm run dev",
+    "beforeDevCommand": "npm run vite",
     "devUrl": "http://localhost:1420",
     "beforeBuildCommand": "npm run build",
     "frontendDist": "../dist"
@@ -27,11 +27,6 @@
     ],
     "security": {
       "csp": null
-    },
-    "trayIcon": {
-      "iconPath": "icons/icon.png",
-      "iconAsTemplate": true,
-      "menuOnLeftClick": false
     }
   },
   "bundle": {
@@ -41,31 +36,7 @@
       "icons/32x32.png",
       "icons/128x128.png",
       "icons/128x128@2x.png",
-      "icons/icon.icns",
       "icons/icon.ico"
     ]
-  },
-  "plugins": {
-    "shell": {
-      "open": true,
-      "execute": true,
-      "sidecar": false,
-      "scope": [
-        { "name": "powershell", "cmd": "powershell", "args": true },
-        { "name": "bash", "cmd": "bash", "args": true },
-        { "name": "cmd", "cmd": "cmd", "args": true },
-        { "name": "git", "cmd": "git", "args": true },
-        { "name": "docker", "cmd": "docker", "args": true }
-      ]
-    },
-    "sql": {
-      "preloadConnections": ["sqlite:devdeck.db"]
-    },
-    "notification": {
-      "all": true
-    },
-    "global-shortcut": {
-      "shortcuts": []
-    }
   }
 }
