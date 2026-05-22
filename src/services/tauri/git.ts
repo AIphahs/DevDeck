@@ -82,11 +82,14 @@ export async function gitBranches(cwd: string): Promise<GitBranch[]> {
     });
 }
 
-export async function gitRun(cwd: string, subcommand: string): Promise<string> {
+export async function gitRun(
+  cwd: string,
+  subcommand: string
+): Promise<{ output: string; exitCode: number }> {
   const out = await executeCommand({
     shell: "powershell",
     command: `git ${subcommand} 2>&1`,
     workingDir: cwd,
   });
-  return (out.stdout + out.stderr).trim();
+  return { output: (out.stdout + out.stderr).trim(), exitCode: out.exitCode };
 }

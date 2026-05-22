@@ -8,14 +8,20 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
-  GitBranch, GitCommit, RefreshCw, Download, Upload, RotateCcw,
-  FileCode, FolderOpen, AlertCircle, Loader2,
+  GitBranch, RefreshCw, Download, Upload, RotateCcw,
+  FileCode, FolderOpen, AlertCircle, Loader2, CheckCircle2, XCircle,
 } from "lucide-react";
+
+interface ActionResult {
+  sub: string;
+  output: string;
+  ok: boolean;
+}
 
 export function GitPage() {
   const [inputPath, setInputPath] = useState("");
   const [repoPath, setRepoPath] = useState("");
-  const [actionLog, setActionLog] = useState("");
+  const [actionResult, setActionResult] = useState<ActionResult | null>(null);
   const qc = useQueryClient();
 
   const statusQ = useQuery({
@@ -23,32 +29,39 @@ export function GitPage() {
     queryFn: () => gitStatus(repoPath),
     enabled: !!repoPath,
     retry: false,
+    staleTime: 10_000,
   });
   const logQ = useQuery({
     queryKey: ["git-log", repoPath],
     queryFn: () => gitLog(repoPath),
     enabled: !!repoPath,
     retry: false,
+    staleTime: 10_000,
   });
   const branchQ = useQuery({
     queryKey: ["git-branches", repoPath],
     queryFn: () => gitBranches(repoPath),
     enabled: !!repoPath,
     retry: false,
+    staleTime: 10_000,
   });
 
+  const currentPath = repoPath;
   const runAction = useMutation({
-    mutationFn: (sub: string) => gitRun(repoPath, sub),
-    onSuccess: (out, sub) => {
-      setActionLog(`git ${sub}\n${out}`);
-      qc.invalidateQueries({ queryKey: ["git-status", repoPath] });
-      qc.invalidateQueries({ queryKey: ["git-log", repoPath] });
-      qc.invalidateQueries({ queryKey: ["git-branches", repoPath] });
+    mutationFn: (sub: string) => gitRun(currentPath, sub),
+    onSuccess: ({ output, exitCode }, sub) => {
+      setActionResult({ sub, output, ok: exitCode === 0 });
+      qc.invalidateQueries({ queryKey: ["git-status", currentPath] });
+      qc.invalidateQueries({ queryKey: ["git-log", currentPath] });
+      qc.invalidateQueries({ queryKey: ["git-branches", currentPath] });
+    },
+    onError: (err, sub) => {
+      setActionResult({ sub, output: String(err), ok: false });
     },
   });
 
   const load = () => {
-    if (inputPath.trim()) setRepoPath(inputPath.trim());
+    if (inputPath.trim()) { setRepoPath(inputPath.trim()); setActionResult(null); }
   };
 
   const isLoading = statusQ.isLoading || logQ.isLoading;
@@ -217,10 +230,23 @@ export function GitPage() {
             </TabsContent>
           </Tabs>
 
-          {/* Action log */}
-          {actionLog && (
-            <div className="mx-6 mb-4 rounded-lg border border-border bg-muted/50 p-3">
-              <pre className="font-mono text-xs text-muted-foreground whitespace-pre-wrap">{actionLog}</pre>
+          {/* Action result */}
+          {actionResult && (
+            <div className={cn(
+              "mx-6 mb-4 rounded-lg border p-3 space-y-1.5",
+              actionResult.ok ? "border-emerald-500/30 bg-emerald-500/5" : "border-red-500/30 bg-red-500/5"
+            )}>
+              <div className="flex items-center gap-2">
+                {actionResult.ok
+                  ? <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400 shrink-0" />
+                  : <XCircle className="h-3.5 w-3.5 text-red-400 shrink-0" />}
+                <span className={cn("text-xs font-medium font-mono", actionResult.ok ? "text-emerald-400" : "text-red-400")}>
+                  git {actionResult.sub}
+                </span>
+              </div>
+              {actionResult.output && (
+                <pre className="font-mono text-xs text-muted-foreground whitespace-pre-wrap pl-5">{actionResult.output}</pre>
+              )}
             </div>
           )}
         </div>

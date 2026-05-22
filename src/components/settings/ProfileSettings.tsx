@@ -41,10 +41,22 @@ export function ProfileSettings() {
       if (!file) return;
       const text = await file.text();
       try {
-        const imported = JSON.parse(text);
-        useProfileStore.getState().addProfile({ ...imported, id: crypto.randomUUID() });
-      } catch {
-        alert("Invalid profile file.");
+        const data = JSON.parse(text);
+        if (
+          typeof data !== "object" || data === null ||
+          typeof data.name !== "string" || !data.name.trim() ||
+          !Array.isArray(data.pages) ||
+          !data.pages.every((p: unknown) =>
+            typeof p === "object" && p !== null &&
+            typeof (p as Record<string, unknown>).name === "string" &&
+            Array.isArray((p as Record<string, unknown>).buttons)
+          )
+        ) {
+          throw new Error("Fichier de profil invalide ou corrompu.");
+        }
+        useProfileStore.getState().addProfile({ ...data, id: crypto.randomUUID() });
+      } catch (err) {
+        alert(err instanceof Error ? err.message : "Fichier de profil invalide.");
       }
     };
     input.click();
@@ -53,9 +65,9 @@ export function ProfileSettings() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <span className="text-base font-medium">Profiles</span>
+        <span className="text-base font-medium">Profils</span>
         <Button size="sm" variant="outline" onClick={importProfile} className="gap-2">
-          <Upload className="h-3.5 w-3.5" /> Import
+          <Upload className="h-3.5 w-3.5" /> Importer
         </Button>
       </div>
 
@@ -77,7 +89,7 @@ export function ProfileSettings() {
             ) : (
               <>
                 <span className="flex-1 text-sm font-medium">{p.name}</span>
-                {p.id === activeProfileId && <Badge variant="secondary" className="text-xs">Active</Badge>}
+                {p.id === activeProfileId && <Badge variant="secondary" className="text-xs">Actif</Badge>}
                 <span className="text-xs text-muted-foreground">{p.pages.length} page{p.pages.length > 1 ? "s" : ""}</span>
                 <button onClick={() => startEdit(p.id, p.name)} className="text-muted-foreground hover:text-foreground transition-colors">
                   <Pencil className="h-3.5 w-3.5" />
@@ -91,7 +103,7 @@ export function ProfileSettings() {
         ))}
 
         {profiles.length === 0 && (
-          <p className="text-sm text-muted-foreground text-center py-4">No profiles yet. Create one from the sidebar.</p>
+          <p className="text-sm text-muted-foreground text-center py-4">Aucun profil. Créez-en un depuis la barre latérale.</p>
         )}
       </div>
     </div>

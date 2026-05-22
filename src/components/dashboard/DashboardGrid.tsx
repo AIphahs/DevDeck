@@ -41,7 +41,7 @@ export function DashboardGrid() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-semibold">Dashboard</h1>
-          <p className="text-sm text-muted-foreground">Your DevDeck overview</p>
+          <p className="text-sm text-muted-foreground">Vue d'ensemble de votre DevDeck</p>
         </div>
         <div className="flex items-center gap-2">
           {isEditing && <AddWidgetMenu />}
@@ -52,9 +52,9 @@ export function DashboardGrid() {
             className="gap-2"
           >
             {isEditing ? (
-              <><Check className="h-4 w-4" /> Done</>
+              <><Check className="h-4 w-4" /> Terminé</>
             ) : (
-              <><Pencil className="h-4 w-4" /> Edit</>
+              <><Pencil className="h-4 w-4" /> Modifier</>
             )}
           </Button>
         </div>
@@ -76,7 +76,7 @@ export function DashboardGrid() {
 
       {widgets.length === 0 && (
         <div className="flex flex-1 flex-col items-center justify-center gap-3 text-muted-foreground">
-          <p className="text-sm">No widgets yet.</p>
+          <p className="text-sm">Aucun widget — ajoutez-en un pour commencer.</p>
           <AddWidgetMenu />
         </div>
       )}

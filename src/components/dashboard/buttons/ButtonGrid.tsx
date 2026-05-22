@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { DndContext, DragEndEvent, PointerSensor, useSensor, useSensors, closestCenter } from "@dnd-kit/core";
 import { SortableContext, rectSortingStrategy } from "@dnd-kit/sortable";
-import { Pencil, Check, ChevronLeft, ChevronRight, Plus } from "lucide-react";
+import { Pencil, Check, ChevronLeft, ChevronRight, Plus, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { cn } from "@/utils/cn";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { useProfileStore } from "@/store/profileStore";
 import { useActiveProfile } from "@/hooks/useActiveProfile";
 import { ButtonCard } from "./ButtonCard";
@@ -17,7 +19,7 @@ const ROWS = 3;
 const TOTAL = COLS * ROWS;
 
 export function ButtonGrid() {
-  const { addButton, updateButton, deleteButton, addPage } = useProfileStore();
+  const { addButton, updateButton, deleteButton, addPage, deletePage } = useProfileStore();
   const profile = useActiveProfile();
 
   const [isEditing, setIsEditing] = useState(false);
@@ -25,14 +27,15 @@ export function ButtonGrid() {
   const [editingButton, setEditingButton] = useState<ButtonType | null>(null);
   const [newSlot, setNewSlot] = useState<{ col: number; row: number } | null>(null);
   const [editorOpen, setEditorOpen] = useState(false);
+  const [deleteConfirmPage, setDeleteConfirmPage] = useState<Page | null>(null);
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }));
 
   if (!profile) {
     return (
       <div className="flex h-full flex-col items-center justify-center gap-3 text-muted-foreground">
-        <p className="text-sm">No profile selected.</p>
-        <p className="text-xs">Create a profile in Settings.</p>
+        <p className="text-sm">Aucun profil sélectionné.</p>
+        <p className="text-xs">Créez un profil dans Paramètres.</p>
       </div>
     );
   }
@@ -47,11 +50,9 @@ export function ButtonGrid() {
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event;
     if (!over || active.id === over.id || !currentPage) return;
-
     const moved = currentPage.buttons.find((b) => b.id === active.id);
     const target = currentPage.buttons.find((b) => b.id === over.id);
     if (!moved || !target) return;
-
     updateButton(profile.id, currentPage.id, moved.id, { col: target.col, row: target.row });
     updateButton(profile.id, currentPage.id, target.id, { col: moved.col, row: moved.row });
   }
@@ -87,6 +88,27 @@ export function ButtonGrid() {
     setCurrentPageIdx(pages.length);
   }
 
+  function handleDeletePageRequest(page: Page) {
+    if (page.buttons.length === 0) {
+      // Empty page — delete immediately without confirmation
+      doDeletePage(page);
+    } else {
+      setDeleteConfirmPage(page);
+    }
+  }
+
+  function doDeletePage(page: Page) {
+    const idx = pages.findIndex((p) => p.id === page.id);
+    deletePage(profile.id, page.id);
+    // Adjust currentPageIdx so we don't go out of bounds
+    if (idx < currentPageIdx) {
+      setCurrentPageIdx((prev) => prev - 1);
+    } else if (idx === currentPageIdx) {
+      setCurrentPageIdx(Math.max(0, idx - 1));
+    }
+    setDeleteConfirmPage(null);
+  }
+
   const buttonIds = currentPage?.buttons.map((b) => b.id) ?? [];
 
   return (
@@ -103,7 +125,7 @@ export function ButtonGrid() {
           onClick={() => setIsEditing((v) => !v)}
           className="gap-2"
         >
-          {isEditing ? <><Check className="h-4 w-4" />Done</> : <><Pencil className="h-4 w-4" />Edit</>}
+          {isEditing ? <><Check className="h-4 w-4" /> Terminé</> : <><Pencil className="h-4 w-4" /> Modifier</>}
         </Button>
       </div>
 
@@ -158,21 +180,59 @@ export function ButtonGrid() {
 
       {/* Page navigation */}
       <div className="flex items-center justify-center gap-2">
-        <Button size="icon" variant="ghost" disabled={currentPageIdx === 0} onClick={() => setCurrentPageIdx((i) => i - 1)}>
+        <Button
+          size="icon" variant="ghost"
+          disabled={currentPageIdx === 0}
+          onClick={() => setCurrentPageIdx((i) => i - 1)}
+        >
           <ChevronLeft className="h-4 w-4" />
         </Button>
 
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-2">
           {pages.map((p, i) => (
-            <button
-              key={p.id}
-              onClick={() => setCurrentPageIdx(i)}
-              className={`h-2 w-2 rounded-full transition-all ${i === currentPageIdx ? "bg-primary w-4" : "bg-muted-foreground/40"}`}
-            />
+            <div key={p.id} className="group relative flex flex-col items-center">
+              {/* Delete button — shown on hover when editing and more than 1 page */}
+              {isEditing && pages.length > 1 && (
+                <button
+                  onClick={() => handleDeletePageRequest(p)}
+                  title={`Supprimer "${p.name}"`}
+                  className={cn(
+                    "absolute -top-5 left-1/2 -translate-x-1/2",
+                    "flex h-4 w-4 items-center justify-center rounded-full",
+                    "bg-destructive text-destructive-foreground",
+                    "opacity-0 group-hover:opacity-100 transition-opacity duration-150",
+                    "hover:scale-110"
+                  )}
+                >
+                  <X className="h-2.5 w-2.5" />
+                </button>
+              )}
+
+              {/* Page dot */}
+              <button
+                onClick={() => setCurrentPageIdx(i)}
+                title={p.name}
+                className={cn(
+                  "h-2 rounded-full transition-all duration-200",
+                  i === currentPageIdx
+                    ? "bg-primary w-5"
+                    : "bg-muted-foreground/40 w-2 hover:bg-muted-foreground/60"
+                )}
+              />
+
+              {/* Page name — shown below active dot when editing */}
+              {isEditing && i === currentPageIdx && (
+                <span className="absolute top-4 text-[10px] text-muted-foreground whitespace-nowrap">
+                  {p.name}
+                </span>
+              )}
+            </div>
           ))}
+
           {isEditing && (
             <button
               onClick={handleAddPage}
+              title="Ajouter une page"
               className="flex h-5 w-5 items-center justify-center rounded-full border border-dashed border-border hover:border-primary hover:text-primary transition-colors"
             >
               <Plus className="h-3 w-3" />
@@ -180,10 +240,39 @@ export function ButtonGrid() {
           )}
         </div>
 
-        <Button size="icon" variant="ghost" disabled={currentPageIdx >= pages.length - 1} onClick={() => setCurrentPageIdx((i) => i + 1)}>
+        <Button
+          size="icon" variant="ghost"
+          disabled={currentPageIdx >= pages.length - 1}
+          onClick={() => setCurrentPageIdx((i) => i + 1)}
+        >
           <ChevronRight className="h-4 w-4" />
         </Button>
       </div>
+
+      {/* Delete page confirmation */}
+      <Dialog open={!!deleteConfirmPage} onOpenChange={(o) => { if (!o) setDeleteConfirmPage(null); }}>
+        <DialogContent className="max-w-xs">
+          <DialogHeader>
+            <DialogTitle>Supprimer la page</DialogTitle>
+            <DialogDescription>
+              "{deleteConfirmPage?.name}" contient {deleteConfirmPage?.buttons.length} bouton
+              {(deleteConfirmPage?.buttons.length ?? 0) > 1 ? "s" : ""}. Cette action est irréversible.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" size="sm" onClick={() => setDeleteConfirmPage(null)}>
+              Annuler
+            </Button>
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={() => deleteConfirmPage && doDeletePage(deleteConfirmPage)}
+            >
+              Supprimer
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Button editor dialog */}
       <ButtonEditor

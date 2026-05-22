@@ -5,7 +5,7 @@ import { cn } from "@/utils/cn";
 import { useProfileStore } from "@/store/profileStore";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { generateId } from "@/utils/format";
 import type { Profile } from "@/types";
 
@@ -35,6 +35,7 @@ export function ProfileSelector({ collapsed }: Props) {
   const [open, setOpen] = useState(false);
   const [newProfileOpen, setNewProfileOpen] = useState(false);
   const [newName, setNewName] = useState("");
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
 
   function handleCreate() {
     if (!newName.trim()) return;
@@ -51,7 +52,7 @@ export function ProfileSelector({ collapsed }: Props) {
       <button
         onClick={() => setOpen((v) => !v)}
         className="flex h-8 w-8 items-center justify-center rounded-md bg-primary/20 text-xs font-bold text-primary"
-        title={activeProfile?.name ?? "No profile"}
+        title={activeProfile?.name ?? "Aucun profil"}
       >
         {(activeProfile?.name ?? "?")[0].toUpperCase()}
       </button>
@@ -70,7 +71,7 @@ export function ProfileSelector({ collapsed }: Props) {
         <div className="flex h-6 w-6 items-center justify-center rounded bg-primary/20 text-xs font-bold text-primary shrink-0">
           {(activeProfile?.name ?? "?")[0].toUpperCase()}
         </div>
-        <span className="flex-1 truncate text-left">{activeProfile?.name ?? "Select profile"}</span>
+        <span className="flex-1 truncate text-left">{activeProfile?.name ?? "Sélectionner un profil"}</span>
         <ChevronDown className={cn("h-3 w-3 text-muted-foreground transition-transform", open && "rotate-180")} />
       </button>
 
@@ -90,11 +91,11 @@ export function ProfileSelector({ collapsed }: Props) {
                   className="flex flex-1 items-center gap-2 rounded px-2 py-1.5 text-sm hover:bg-accent transition-colors"
                 >
                   {p.id === activeProfileId && <Check className="h-3 w-3 text-primary shrink-0" />}
-                  <span className={cn("truncate", p.id !== activeProfileId && "pl-4")}>{p.name}</span>
+                  <span className={cn("truncate flex-1 text-left", p.id !== activeProfileId && "pl-4")}>{p.name}</span>
                 </button>
                 {profiles.length > 1 && (
                   <button
-                    onClick={() => deleteProfile(p.id)}
+                    onClick={(e) => { e.stopPropagation(); setDeleteConfirmId(p.id); }}
                     className="hidden group-hover:flex h-6 w-6 items-center justify-center rounded hover:bg-destructive/20 hover:text-destructive transition-colors"
                   >
                     <Trash2 className="h-3 w-3" />
@@ -108,29 +109,58 @@ export function ProfileSelector({ collapsed }: Props) {
                 onClick={() => setNewProfileOpen(true)}
                 className="flex w-full items-center gap-2 rounded px-2 py-1.5 text-sm text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
               >
-                <Plus className="h-3 w-3" /> New profile
+                <Plus className="h-3 w-3" /> Nouveau profil
               </button>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
 
+      {/* Delete confirmation dialog */}
+      <Dialog open={!!deleteConfirmId} onOpenChange={(o) => { if (!o) setDeleteConfirmId(null); }}>
+        <DialogContent className="max-w-xs">
+          <DialogHeader>
+            <DialogTitle>Supprimer le profil</DialogTitle>
+            <DialogDescription>
+              {(() => {
+                const p = profiles.find((x) => x.id === deleteConfirmId);
+                return `Supprimer "${p?.name}" et ses ${p?.pages.reduce((acc, pg) => acc + pg.buttons.length, 0)} boutons ? Cette action est irréversible.`;
+              })()}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" size="sm" onClick={() => setDeleteConfirmId(null)}>Annuler</Button>
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={() => {
+                if (deleteConfirmId) deleteProfile(deleteConfirmId);
+                setDeleteConfirmId(null);
+                setOpen(false);
+              }}
+            >
+              Supprimer
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* New profile dialog */}
       <Dialog open={newProfileOpen} onOpenChange={setNewProfileOpen}>
         <DialogContent className="max-w-xs">
           <DialogHeader>
-            <DialogTitle>New profile</DialogTitle>
+            <DialogTitle>Nouveau profil</DialogTitle>
           </DialogHeader>
           <Input
             value={newName}
             onChange={(e) => setNewName(e.target.value)}
-            placeholder="Profile name"
+            placeholder="Nom du profil"
             onKeyDown={(e) => e.key === "Enter" && handleCreate()}
             autoFocus
           />
           <DialogFooter>
-            <Button variant="outline" size="sm" onClick={() => setNewProfileOpen(false)}>Cancel</Button>
-            <Button size="sm" onClick={handleCreate} disabled={!newName.trim()}>Create</Button>
+            <Button variant="outline" size="sm" onClick={() => setNewProfileOpen(false)}>Annuler</Button>
+            <Button size="sm" onClick={handleCreate} disabled={!newName.trim()}>Créer</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

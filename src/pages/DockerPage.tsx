@@ -8,8 +8,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Container, RefreshCw, Play, Square, Trash2, FileText,
-  AlertCircle, Loader2, Image as ImageIcon, X,
+  AlertCircle, Loader2, Image as ImageIcon,
 } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 export function DockerPage() {
   const qc = useQueryClient();
@@ -150,24 +151,19 @@ export function DockerPage() {
         </Tabs>
       )}
 
-      {/* Logs modal */}
-      {logsModal && (
-        <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/60">
-          <div className="w-[680px] max-h-[80vh] flex flex-col rounded-xl border border-border bg-card shadow-2xl overflow-hidden">
-            <div className="flex items-center justify-between px-4 py-3 border-b border-border">
-              <span className="font-mono text-sm font-medium">{logsModal.name} — logs</span>
-              <button onClick={() => setLogsModal(null)} className="text-muted-foreground hover:text-foreground">
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-            <ScrollArea className="flex-1">
-              <pre className="p-4 font-mono text-xs text-[#d4d4d4] whitespace-pre-wrap break-all leading-relaxed">
-                {logsModal.content || "(no output)"}
-              </pre>
-            </ScrollArea>
-          </div>
-        </div>
-      )}
+      {/* Logs dialog */}
+      <Dialog open={!!logsModal} onOpenChange={(o) => { if (!o) setLogsModal(null); }}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="font-mono">{logsModal?.name} — logs</DialogTitle>
+          </DialogHeader>
+          <ScrollArea className="max-h-[60vh] rounded-md border border-border bg-[#0d0d0d]">
+            <pre className="p-4 font-mono text-xs text-[#d4d4d4] whitespace-pre-wrap break-all leading-relaxed">
+              {logsModal?.content || "(aucune sortie)"}
+            </pre>
+          </ScrollArea>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import { lazy, Suspense } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useUIStore } from "@/store/uiStore";
+import { ErrorBoundary } from "@/components/shared/ErrorBoundary";
 
 const DashboardPage = lazy(() => import("@/pages/DashboardPage").then((m) => ({ default: m.DashboardPage })));
 const DeckPage = lazy(() => import("@/pages/DeckPage").then((m) => ({ default: m.DeckPage })));
@@ -49,9 +50,11 @@ export function MainContent() {
           transition={{ duration: 0.15, ease: "easeOut" }}
           className="h-full"
         >
-          <Suspense fallback={<PageFallback />}>
-            <Panel />
-          </Suspense>
+          <ErrorBoundary>
+            <Suspense fallback={<PageFallback />}>
+              <Panel />
+            </Suspense>
+          </ErrorBoundary>
         </motion.div>
       </AnimatePresence>
     </main>

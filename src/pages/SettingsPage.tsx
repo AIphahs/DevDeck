@@ -9,7 +9,7 @@ export function SettingsPage() {
   return (
     <div className="flex h-full flex-col">
       <div className="flex items-center gap-3 border-b border-border px-6 py-4">
-        <h1 className="text-xl font-semibold">Settings</h1>
+        <h1 className="text-xl font-semibold">Paramètres</h1>
       </div>
 
       <Tabs defaultValue="appearance" className="flex flex-1 overflow-hidden">
@@ -17,16 +17,16 @@ export function SettingsPage() {
         <div className="w-44 shrink-0 border-r border-border p-3">
           <TabsList className="flex h-auto flex-col items-stretch gap-1 bg-transparent p-0">
             <TabsTrigger value="appearance" className="justify-start data-[state=active]:bg-accent">
-              Appearance
+              Apparence
             </TabsTrigger>
             <TabsTrigger value="profiles" className="justify-start data-[state=active]:bg-accent">
-              Profiles
+              Profils
             </TabsTrigger>
             <TabsTrigger value="shortcuts" className="justify-start data-[state=active]:bg-accent">
-              Shortcuts
+              Raccourcis
             </TabsTrigger>
             <TabsTrigger value="about" className="justify-start data-[state=active]:bg-accent">
-              About
+              À propos
             </TabsTrigger>
           </TabsList>
         </div>
@@ -44,8 +44,8 @@ export function SettingsPage() {
 
             <TabsContent value="shortcuts" className="mt-0">
               <div className="space-y-2">
-                <p className="text-base font-medium">Global shortcuts</p>
-                <p className="text-sm text-muted-foreground">Shortcut management coming in Phase 3.</p>
+                <p className="text-base font-medium">Raccourcis globaux</p>
+                <p className="text-sm text-muted-foreground">Gestion des raccourcis clavier — Phase 4.</p>
               </div>
             </TabsContent>
 
@@ -55,7 +55,7 @@ export function SettingsPage() {
                   <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-primary-foreground font-bold text-xl">D</div>
                   <div>
                     <p className="font-semibold text-lg">DevDeck</p>
-                    <p className="text-sm text-muted-foreground">v0.1.0 — Phase 2</p>
+                    <p className="text-sm text-muted-foreground">v0.1.0 — Phase 3</p>
                   </div>
                 </div>
                 <Separator />
