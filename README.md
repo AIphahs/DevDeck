@@ -1,375 +1,206 @@
 # DevDeck
-# Functional Specifications
 
-# Project Objective
+> Modular Desktop Automation Platform for Developers, DevOps Engineers & Creators.
 
-DevDeck is a modular and scalable desktop automation platform designed to centralize productivity, development workflows, communication shortcuts, system automation, and multimedia controls inside a customizable interface.
-
-The application must provide a modern and extensible experience inspired by Stream Deck systems while targeting developers, DevOps engineers, creators, artists and advanced users.
+Inspired by Stream Deck — rebuilt for the command line generation.
 
 ---
 
-# Core Functional Requirements
+## Tech Stack
 
-# 1. User Interface System
-
-## 1.1 Dashboard
-
-The application must provide:
-
-* A customizable dashboard
-* Drag & drop widget positioning
-* Responsive grid layout
-* Multi-page navigation
-* Theme customization
-* Light/Dark mode
-* Animated transitions
-* Dockable panels
-
-## 1.2 Profiles
-
-The application must support:
-
-* Multiple user profiles
-* Export/import profiles
-* Profile switching
-* Context-aware profiles
-* Per-profile shortcuts and settings
-* Profile customization options
-
-## 1.3 Buttons & Actions
-
-The interface must allow users to:
-
-* Create custom buttons
-* Assign actions to buttons
-* Configure icons and labels
-* Configure dynamic states
-* Create folders/groups
-* Create multi-actions/macros
-* Configure execution delays
+| Layer | Technology |
+|---|---|
+| Runtime | Tauri v2 (Rust + WebView) |
+| Frontend | React 19 + TypeScript + Vite |
+| State | Zustand + TanStack Query |
+| UI | shadcn/ui + Radix UI + Tailwind CSS |
+| Animations | Framer Motion |
+| Drag & Drop | dnd-kit |
+| Terminal | xterm.js + node-pty |
+| Audio | Howler.js + CPAL (Rust) |
+| Database | SQLite (tauri-plugin-sql) |
+| Shortcuts | tauri-plugin-global-shortcut |
+| AI | Claude API (Anthropic) |
+| Testing | Vitest + Playwright |
 
 ---
 
-# 2. Automation System
+## Project Roadmap
 
-## 2.1 Command Execution
+### Phase 1 — Setup & Foundation (Weeks 1–3)
+- [x] Project structure
+- [ ] Node.js + Rust + Tauri CLI installation
+- [ ] SQLite migrations
+- [ ] CI/CD (GitHub Actions — Win/Linux/macOS)
+- [ ] Logging (tracing Rust + console frontend)
 
-The system must support:
+### Phase 2 — Core UI Shell (Weeks 4–7)
+- [ ] Dashboard with drag & drop grid (dnd-kit)
+- [ ] Widget system
+- [ ] Light/Dark theme + customisation
+- [ ] Animated transitions (Framer Motion)
+- [ ] Profile management (CRUD + export/import)
+- [ ] Button/action system with icons and states
 
-* PowerShell commands
-* Bash commands
-* CMD commands
-* Script execution
-* Process launching
-* Process termination
-* Background tasks
+### Phase 3 — Developer Tools (Weeks 8–12)
+- [ ] Embedded terminal (xterm.js + node-pty)
+- [ ] Multi-tab terminal
+- [ ] Git integration (pull/push/commit/branch + GitHub/GitLab)
+- [ ] Docker integration (start/stop/restart/logs/compose)
+- [ ] Global shortcuts + conflict detection
 
-## 2.2 Macro System
+### Phase 4 — Automation System (Weeks 13–16)
+- [ ] Script execution (PowerShell, Bash, CMD)
+- [ ] Keyboard & mouse macros
+- [ ] Multi-step workflows with conditions
+- [ ] Scheduled automation
+- [ ] Process manager (launch/kill/background)
 
-The application must support:
+### Phase 5 — Soundboard (Weeks 17–19)
+- [ ] Audio playback (Howler.js)
+- [ ] Instant triggering, loop, volume per clip
+- [ ] Output device routing (CPAL Rust)
+- [ ] Virtual microphone routing
+- [ ] Global hotkeys for soundboard
 
-* Keyboard macros
-* Mouse macros
-* Multi-step workflows
-* Conditional execution
-* Delayed execution
-* Scheduled automation
-* Hotkeys
+### Phase 6 — Monitoring & Observability (Weeks 20–22)
+- [ ] CPU / RAM / Disk / Network / GPU (sysinfo Rust)
+- [ ] Temperature monitoring
+- [ ] Process monitoring + resource alerts
+- [ ] Docker metrics
+- [ ] Grafana / Prometheus / CI/CD status integration
 
-## 2.3 Global Shortcuts
+### Phase 7 — Communication (Weeks 23–25)
+- [ ] Discord RPC (rich presence, mute/unmute, PTT)
+- [ ] Clipboard snippets manager
+- [ ] Notification center
+- [ ] Quick message / status shortcuts
 
-The application must provide:
+### Phase 8 — Plugin System (Weeks 26–31)
+- [ ] Plugin loader + registry + lifecycle
+- [ ] ACL sandbox + permissions
+- [ ] TypeScript Plugin SDK (actions, widgets, events)
+- [ ] Plugin marketplace UI (install/update/ratings)
+- [ ] First-party plugins (git, docker, soundboard)
 
-* Global keyboard shortcuts
-* Shortcut recording
-* Shortcut conflict detection
-* Shortcut profiles
+### Phase 9 — AI Features (Weeks 32–34)
+- [ ] Claude API integration (Anthropic)
+- [ ] Shell command generation
+- [ ] Error & log explanation
+- [ ] DevOps contextual assistant
+- [ ] Workflow suggestions
+- [ ] Optional Ollama local backend
 
----
-
-# 3. Developer Tools
-
-## 3.1 Git Integration
-
-The application must allow:
-
-* Quick repository access
-* Git pull/push actions
-* Commit generation
-* Branch switching
-* Recent repository tracking
-* GitHub/GitLab integration
-
-## 3.2 Docker Integration
-
-The application must provide:
-
-* Container monitoring
-* Container start/stop/restart
-* Docker Compose execution
-* Logs visualization
-* Image management
-
-## 3.3 Terminal Integration
-
-The system must provide:
-
-* Embedded terminal
-* Multi-terminal tabs
-* Saved commands
-* Command history
-* SSH shortcuts
-* Environment presets
-
----
-
-# 4. Soundboard System
-
-## 4.1 Audio Playback
-
-The application must support:
-
-* Audio file upload
-* Audio playback
-* Instant triggering
-* Loop playback
-* Volume adjustment
-* Categories/playlists
-* Drag & drop organization
-
-## 4.2 Audio Routing
-
-The application must allow:
-
-* Output device selection
-* Virtual microphone routing
-* Per-sound volume mixing
-* Microphone integration
-
-## 4.3 Hotkeys
-
-The soundboard must support:
-
-* Global hotkeys
-* Multiple trigger modes
-* Push-to-play
-* Toggle playback
+### Phase 10 — Security, Polish & Release (Weeks 35–38)
+- [ ] SQLite encryption (SQLCipher)
+- [ ] Secrets vault
+- [ ] Execution sandboxing
+- [ ] Cross-platform testing (Win/Linux/macOS/Android)
+- [ ] Performance profiling (< 3s startup, minimal RAM)
+- [ ] User + Plugin SDK documentation
+- [ ] GitHub Releases + auto-update
 
 ---
 
-# 5. Discord & Communication Features
+## Project Structure
 
-## 5.1 Discord Integration
-
-The system must provide:
-
-* Quick message shortcuts
-* Voice channel shortcuts
-* Mic mute/unmute
-* Push-to-talk shortcuts
-* Status management
-* Rich presence integration
-
-## 5.2 Communication Tools
-
-The application should support:
-
-* Clipboard snippets
-* Quick responses
-* Notification center
-* Team shortcuts
-
----
-
-# 6. Monitoring & Observability
-
-## 6.1 System Monitoring
-
-The application must display:
-
-* CPU usage
-* RAM usage
-* Disk usage
-* Network activity
-* GPU usage
-* Temperature monitoring
-
-
-## 6.2 Application Monitoring
-
-The system must provide:
-
-* Running process monitoring
-* Resource consumption analysis
-* Logs viewer
-* Alerts and notifications
-
-## 6.3 DevOps Monitoring
-
-The application should support:
-
-* Docker metrics
-* Kubernetes metrics
-* CI/CD pipeline status
-* Grafana integration
-* Prometheus integration
-
----
-
-# 7. Plugin System
-
-## 7.1 Plugin Architecture
-
-The platform must support:
-
-* Dynamic plugin loading
-* Plugin isolation
-* Plugin lifecycle management
-* Plugin permissions
-* Version compatibility
-
-## 7.2 Plugin SDK
-
-The SDK must allow developers to:
-
-* Register actions
-* Register widgets
-* Register events
-* Access APIs
-* Extend the UI
-
-## 7.3 Marketplace
-
-The application should support:
-
-* Plugin marketplace
-* Plugin installation/update
-* Plugin ratings
-* Community plugins
+```
+DevDeck/
+├── .github/workflows/        # CI/CD (build Win/Linux/macOS)
+├── src/                      # Frontend (React + TypeScript)
+│   ├── components/
+│   │   ├── layout/           # AppLayout, Sidebar, Topbar
+│   │   ├── dashboard/        # Grid, widgets
+│   │   ├── terminal/         # xterm.js integration
+│   │   ├── soundboard/       # Audio player UI
+│   │   ├── monitoring/       # CPU/RAM/GPU charts
+│   │   ├── git/              # Git panel
+│   │   ├── docker/           # Docker panel
+│   │   ├── ai/               # AI chat
+│   │   ├── plugins/          # Marketplace UI
+│   │   ├── settings/         # Settings panels
+│   │   ├── shortcuts/        # Shortcut recorder
+│   │   └── ui/               # shadcn/ui base components
+│   ├── pages/                # Route-level page components
+│   ├── store/                # Zustand stores
+│   │   ├── profileStore.ts   # Profiles, pages, buttons
+│   │   ├── themeStore.ts     # Theme + accent color
+│   │   └── uiStore.ts        # Active panel, sidebar state
+│   ├── services/
+│   │   ├── tauri/            # IPC wrappers (system, shell)
+│   │   └── ai/               # Claude API client
+│   ├── plugins/
+│   │   ├── sdk/              # Plugin SDK TypeScript types
+│   │   ├── loader/           # Dynamic plugin loading
+│   │   └── registry/         # Action & widget registry
+│   ├── types/                # Shared TypeScript interfaces
+│   ├── utils/                # cn(), formatBytes(), generateId()
+│   └── styles/globals.css    # Tailwind + CSS variables
+├── src-tauri/                # Rust backend
+│   ├── src/
+│   │   ├── commands/         # Tauri invoke handlers
+│   │   │   ├── system.rs     # CPU, RAM, processes
+│   │   │   ├── shell.rs      # PowerShell/Bash/CMD execution
+│   │   │   ├── audio.rs      # CPAL device listing
+│   │   │   └── automation.rs # Shortcut registration
+│   │   ├── monitoring/       # SystemMonitor struct (sysinfo)
+│   │   ├── database/
+│   │   │   └── migrations/   # SQL migration files
+│   │   ├── security/
+│   │   │   ├── encryption.rs # AES-256-GCM secrets vault
+│   │   │   └── permissions.rs # Plugin permission model
+│   │   ├── plugins/
+│   │   │   ├── registry.rs   # PluginManifest + status
+│   │   │   └── loader.rs     # Load from filesystem
+│   │   ├── lib.rs            # App setup, plugin registration
+│   │   └── main.rs           # Entry point
+│   ├── Cargo.toml
+│   └── tauri.conf.json
+├── plugins/                  # First-party DevDeck plugins
+│   ├── devdeck-sdk/          # Shareable SDK package
+│   ├── devdeck-git/
+│   └── devdeck-docker/
+├── tests/
+│   ├── unit/                 # Vitest unit tests
+│   └── e2e/                  # Playwright E2E tests
+└── docs/                     # Architecture + API docs
+```
 
 ---
 
-# 8. AI Features
+## Prerequisites
 
-## 8.1 AI Assistant
+Before running, install:
 
-The application should provide:
+1. **Node.js 22+** — [nodejs.org](https://nodejs.org)
+2. **Rust** — [rustup.rs](https://rustup.rs)
+3. **Tauri CLI** — `cargo install tauri-cli --version "^2.0"`
+4. **Windows build tools** (Windows only) — `npm install -g windows-build-tools`
 
-* Command generation
-* Error explanation
-* Shell assistance
-* DevOps assistant
-* Code snippet generation
+## Getting Started
 
-## 8.2 AI Automation
+```bash
+# Install dependencies
+npm install
 
-The system should support:
+# Start in development mode
+npm run dev
 
-* Workflow suggestions
-* Smart recommendations
-* Log summarization
-* AI-powered shortcuts
+# Run tests
+npm test
 
----
-
-# 9. Security Requirements
-
-The application must provide:
-
-* Permission management
-* Secure script execution
-* Encrypted local storage
-* Secrets protection
-* Plugin validation
-* Execution sandboxing
+# Build for production
+npm run build
+```
 
 ---
 
-# 10. Performance Requirements
+## Functional Specifications
 
-The application must:
-
-* Launch in under 3 seconds
-* Consume minimal RAM resources
-* Support real-time updates
-* Handle concurrent plugins
-* Remain responsive during automation execution
+See [SPECS.md](docs/SPECS.md) for the full functional specifications.
 
 ---
 
-# 11. Cross-Platform Requirements
+## Author
 
-The application must support:
-
-* Windows
-* Linux
-* macOS
-* Android
-
-The interface and features should remain consistent across platforms.
-
----
-
-# 12. Persistence & Synchronization
-
-The application should support:
-
-* Local profile storage
-* Cloud synchronization
-* Backup and restore
-* Multi-device synchronization
-
----
-
-# 13. Future Functionalities
-
-Planned future features include:
-
-* OBS integration
-* Spotify integration
-* Mobile companion app
-* Tablet controller support
-* Voice control
-* Home automation support
-* AI workflow builder
-* Team collaboration features
-* Hardware
-
----
-
-# Non-Functional Requirements
-
-## Maintainability
-
-* Modular architecture
-* Clean code principles
-* Scalable structure
-* Documentation coverage
-
-## Observability
-
-* Logging system
-* Metrics collection
-* Error tracking
-
-## User Experience
-
-* Smooth animations
-* Modern interface
-* Accessibility support
-* Fast interactions
-
-## Reliability
-
-* Stable plugin execution
-* Crash recovery
-* Fault isolation
-
----
-
-# Author
-
-AIphahs
-
-Software Engineering graduated Student • Full Stack Developer • DevOps Enthusiast • Gamer • Artist
+**AIphahs** — Software Engineering Graduate · Full Stack Developer · DevOps Enthusiast · Gamer · Artist
