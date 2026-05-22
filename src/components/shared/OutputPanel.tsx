@@ -1,6 +1,6 @@
 import { useOutputStore } from "@/store/outputStore";
 import { cn } from "@/utils/cn";
-import { X, ChevronDown, ChevronUp, CheckCircle2, XCircle, Loader2, Trash2 } from "lucide-react";
+import { ChevronDown, ChevronUp, CheckCircle2, XCircle, Loader2, Trash2 } from "lucide-react";
 
 export function OutputPanel() {
   const { entries, isOpen, setOpen, clearEntries } = useOutputStore();

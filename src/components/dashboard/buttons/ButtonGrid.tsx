@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { DndContext, DragEndEvent, PointerSensor, useSensor, useSensors, closestCenter } from "@dnd-kit/core";
-import { SortableContext, rectSortingStrategy } from "@dnd-kit/sortable";
+import { SortableContext as _SortableContext, rectSortingStrategy } from "@dnd-kit/sortable";
+import type { FC, ReactNode } from "react";
+// dnd-kit v8 returns Element instead of ReactNode — cast for React 19 JSX compat
+const SortableContext = _SortableContext as unknown as FC<{ items: (string | number)[]; strategy?: typeof rectSortingStrategy; children?: ReactNode }>;
 import { Pencil, Check, ChevronLeft, ChevronRight, Plus, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/utils/cn";
@@ -48,6 +51,7 @@ export function ButtonGrid() {
   }
 
   function handleDragEnd(event: DragEndEvent) {
+    if (!profile) return;
     const { active, over } = event;
     if (!over || active.id === over.id || !currentPage) return;
     const moved = currentPage.buttons.find((b) => b.id === active.id);
@@ -64,7 +68,7 @@ export function ButtonGrid() {
   }
 
   function handleSaveButton(button: ButtonType) {
-    if (!currentPage) return;
+    if (!profile || !currentPage) return;
     if (button.id && currentPage.buttons.find((b) => b.id === button.id)) {
       updateButton(profile.id, currentPage.id, button.id, { ...button, pageId: currentPage.id });
     } else {
@@ -73,11 +77,12 @@ export function ButtonGrid() {
   }
 
   function handleDeleteButton(id: string) {
-    if (!currentPage) return;
+    if (!profile || !currentPage) return;
     deleteButton(profile.id, currentPage.id, id);
   }
 
   function handleAddPage() {
+    if (!profile) return;
     addPage(profile.id, {
       id: generateId(),
       profileId: profile.id,
@@ -98,6 +103,7 @@ export function ButtonGrid() {
   }
 
   function doDeletePage(page: Page) {
+    if (!profile) return;
     const idx = pages.findIndex((p) => p.id === page.id);
     deletePage(profile.id, page.id);
     // Adjust currentPageIdx so we don't go out of bounds

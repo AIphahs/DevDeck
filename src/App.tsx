@@ -3,10 +3,12 @@ import { useThemeStore, applyAccentColor } from "@/store/themeStore";
 import { useProfileStore } from "@/store/profileStore";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { generateId } from "@/utils/format";
+import { useShortcuts } from "@/hooks/useShortcuts";
 
 export default function App() {
   const { theme, accentColor } = useThemeStore();
   const { profiles, activeProfileId, addProfile, setActiveProfile } = useProfileStore();
+  useShortcuts();
 
   // Bootstrap a default profile on first launch
   useEffect(() => {

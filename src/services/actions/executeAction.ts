@@ -1,7 +1,54 @@
-import type { Button } from "@/types";
+import type { Button, ActionType } from "@/types";
 import { executeCommand } from "@/services/tauri/shell";
 import { open } from "@tauri-apps/plugin-shell";
 import { useOutputStore } from "@/store/outputStore";
+import { toggleClip } from "@/services/audio/soundService";
+
+// Convert "Ctrl+Shift+K" → SendKeys format "^+K" for PowerShell Windows.Forms
+function toSendKeys(combo: string): string {
+  const parts = combo.split("+");
+  let result = "";
+  for (const part of parts) {
+    switch (part) {
+      case "Ctrl":  result += "^"; break;
+      case "Alt":   result += "%"; break;
+      case "Shift": result += "+"; break;
+      case "Meta":  result += "^"; break; // Win key not supported, fall back to Ctrl
+      default: {
+        const specials: Record<string, string> = {
+          Enter: "{ENTER}", Tab: "{TAB}", Escape: "{ESC}", Backspace: "{BACKSPACE}",
+          Delete: "{DELETE}", Home: "{HOME}", End: "{END}",
+          ArrowUp: "{UP}", ArrowDown: "{DOWN}", ArrowLeft: "{LEFT}", ArrowRight: "{RIGHT}",
+          PageUp: "{PGUP}", PageDown: "{PGDN}", Insert: "{INS}", Space: " ",
+        };
+        if (specials[part]) {
+          result += specials[part];
+        } else if (/^F\d+$/.test(part)) {
+          result += `{${part}}`;
+        } else {
+          result += part;
+        }
+      }
+    }
+  }
+  return result;
+}
+
+interface SimpleStep {
+  id?: string;
+  actionType: ActionType;
+  value?: string;
+  shell?: string;
+  delay?: number;
+  // Legacy Button format (backwards compat)
+  actionData?: Record<string, unknown>;
+  styleData?: unknown;
+  label?: string;
+  col?: number;
+  row?: number;
+  pageId?: string;
+  icon?: string;
+}
 
 export async function executeAction(button: Button): Promise<void> {
   const { actionType, actionData } = button;
@@ -22,8 +69,7 @@ export async function executeAction(button: Button): Promise<void> {
     }
 
     case "url": {
-      const url = actionData.url as string;
-      await open(url);
+      await open(actionData.url as string);
       break;
     }
 
@@ -40,16 +86,54 @@ export async function executeAction(button: Button): Promise<void> {
       break;
     }
 
-    case "hotkey":
-      // Handled by Tauri global shortcut plugin
+    case "sound": {
+      const filePath = actionData.soundPath as string;
+      if (!filePath) break;
+      const volume = (actionData.volume as number) ?? 1;
+      const loop = (actionData.loop as boolean) ?? false;
+      toggleClip(button.id, filePath, volume, loop);
       break;
+    }
+
+    case "hotkey": {
+      const keys = actionData.hotkey as string;
+      if (!keys) break;
+      const sendKeys = toSendKeys(keys);
+      // Use WScript.Shell via PowerShell for reliable keystroke injection
+      const psCmd = `$wsh = New-Object -ComObject WScript.Shell; $wsh.SendKeys('${sendKeys.replace(/'/g, "''")}')`;
+      try {
+        await executeCommand({ shell: "powershell", command: psCmd });
+      } catch {
+        // Silent fail — hotkey injection is best-effort
+      }
+      break;
+    }
 
     case "multi": {
-      const steps = (actionData.steps as Button[]) ?? [];
-      for (const step of steps) {
-        const delay = (step.actionData.delay as number) ?? 0;
+      const rawSteps = (actionData.steps as SimpleStep[]) ?? [];
+      for (const step of rawSteps) {
+        const delay = step.delay ?? (step.actionData?.delay as number) ?? 0;
         if (delay > 0) await new Promise((r) => setTimeout(r, delay));
-        await executeAction(step);
+
+        // Normalise to a Button-like object that executeAction can recurse into
+        const stepActionData: Record<string, unknown> = step.actionData ?? (
+          step.actionType === "command" ? { command: step.value ?? "", shell: step.shell ?? "powershell" } :
+          step.actionType === "url"     ? { url: step.value ?? "" } :
+          step.actionType === "app"     ? { path: step.value ?? "" } :
+          {}
+        );
+
+        await executeAction({
+          id: step.id ?? "",
+          pageId: step.pageId ?? "",
+          label: step.label ?? "",
+          col: step.col ?? 0,
+          row: step.row ?? 0,
+          icon: step.icon,
+          actionType: step.actionType,
+          actionData: stepActionData,
+          styleData: {},
+        });
       }
       break;
     }

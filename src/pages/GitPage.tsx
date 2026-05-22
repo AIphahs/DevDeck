@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { gitStatus, gitLog, gitBranches, gitRun } from "@/services/tauri/git";
 import { cn } from "@/utils/cn";
@@ -23,6 +23,8 @@ export function GitPage() {
   const [repoPath, setRepoPath] = useState("");
   const [actionResult, setActionResult] = useState<ActionResult | null>(null);
   const qc = useQueryClient();
+  const repoPathRef = useRef(repoPath);
+  repoPathRef.current = repoPath;
 
   const statusQ = useQuery({
     queryKey: ["git-status", repoPath],
@@ -46,14 +48,14 @@ export function GitPage() {
     staleTime: 10_000,
   });
 
-  const currentPath = repoPath;
   const runAction = useMutation({
-    mutationFn: (sub: string) => gitRun(currentPath, sub),
+    mutationFn: (sub: string) => gitRun(repoPathRef.current, sub),
     onSuccess: ({ output, exitCode }, sub) => {
+      const path = repoPathRef.current;
       setActionResult({ sub, output, ok: exitCode === 0 });
-      qc.invalidateQueries({ queryKey: ["git-status", currentPath] });
-      qc.invalidateQueries({ queryKey: ["git-log", currentPath] });
-      qc.invalidateQueries({ queryKey: ["git-branches", currentPath] });
+      qc.invalidateQueries({ queryKey: ["git-status", path] });
+      qc.invalidateQueries({ queryKey: ["git-log", path] });
+      qc.invalidateQueries({ queryKey: ["git-branches", path] });
     },
     onError: (err, sub) => {
       setActionResult({ sub, output: String(err), ok: false });

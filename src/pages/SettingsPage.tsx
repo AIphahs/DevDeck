@@ -3,6 +3,7 @@ import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ThemeSettings } from "@/components/settings/ThemeSettings";
 import { ProfileSettings } from "@/components/settings/ProfileSettings";
+import { ShortcutsSettings } from "@/components/settings/ShortcutsSettings";
 import { Info } from "lucide-react";
 
 export function SettingsPage() {
@@ -43,10 +44,7 @@ export function SettingsPage() {
             </TabsContent>
 
             <TabsContent value="shortcuts" className="mt-0">
-              <div className="space-y-2">
-                <p className="text-base font-medium">Raccourcis globaux</p>
-                <p className="text-sm text-muted-foreground">Gestion des raccourcis clavier — Phase 4.</p>
-              </div>
+              <ShortcutsSettings />
             </TabsContent>
 
             <TabsContent value="about" className="mt-0">
@@ -55,7 +53,7 @@ export function SettingsPage() {
                   <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-primary-foreground font-bold text-xl">D</div>
                   <div>
                     <p className="font-semibold text-lg">DevDeck</p>
-                    <p className="text-sm text-muted-foreground">v0.1.0 — Phase 3</p>
+                    <p className="text-sm text-muted-foreground">v0.1.0 — Phase 4</p>
                   </div>
                 </div>
                 <Separator />

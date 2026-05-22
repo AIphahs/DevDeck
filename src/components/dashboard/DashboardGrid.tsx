@@ -7,7 +7,10 @@ import {
   useSensors,
   closestCenter,
 } from "@dnd-kit/core";
-import { SortableContext, rectSortingStrategy, arrayMove } from "@dnd-kit/sortable";
+import { SortableContext as _SortableContext, rectSortingStrategy, arrayMove } from "@dnd-kit/sortable";
+import type { FC, ReactNode } from "react";
+// dnd-kit v8 returns Element instead of ReactNode — cast for React 19 JSX compat
+const SortableContext = _SortableContext as unknown as FC<{ items: (string | number)[]; strategy?: typeof rectSortingStrategy; children?: ReactNode }>;
 import { Pencil, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useWidgetStore } from "@/store/widgetStore";

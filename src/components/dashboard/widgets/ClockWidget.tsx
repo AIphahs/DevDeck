@@ -11,7 +11,7 @@ export function ClockWidget() {
   const hh = time.getHours().toString().padStart(2, "0");
   const mm = time.getMinutes().toString().padStart(2, "0");
   const ss = time.getSeconds().toString().padStart(2, "0");
-  const date = time.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
+  const date = time.toLocaleDateString(navigator.language, { weekday: "short", month: "short", day: "numeric" });
 
   return (
     <div className="flex h-full flex-col items-center justify-center gap-1">

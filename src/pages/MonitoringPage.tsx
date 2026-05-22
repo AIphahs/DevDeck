@@ -1,16 +1,11 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useSystemInfo } from "@/hooks/useSystemInfo";
 import { getProcesses } from "@/services/tauri/system";
+import { formatBytes } from "@/utils/format";
 import { cn } from "@/utils/cn";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { RefreshCw, Cpu, MemoryStick, HardDrive, Monitor, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useQueryClient } from "@tanstack/react-query";
-
-function formatBytes(bytes: number): string {
-  if (bytes >= 1024 * 1024 * 1024) return `${(bytes / (1024 * 1024 * 1024)).toFixed(1)} GB`;
-  return `${(bytes / (1024 * 1024)).toFixed(0)} MB`;
-}
 
 function pct(used: number, total: number) {
   return total > 0 ? Math.round((used / total) * 100) : 0;
@@ -159,7 +154,7 @@ export function MonitoringPage() {
                   <tbody>
                     {processes.map((p) => (
                       <tr key={p.pid} className="border-b border-border/50 last:border-0 hover:bg-accent/20 transition-colors">
-                        <td className="px-3 py-1.5 font-mono text-foreground truncate max-w-[200px]">{p.name}</td>
+                        <td className="px-3 py-1.5 font-mono text-foreground truncate max-w-[200px]" title={p.name}>{p.name}</td>
                         <td className="px-3 py-1.5 text-right font-mono text-muted-foreground">{p.pid}</td>
                         <td className="px-3 py-1.5 text-right">
                           <span className={cn(
