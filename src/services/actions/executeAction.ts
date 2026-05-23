@@ -91,7 +91,7 @@ export async function executeAction(button: Button): Promise<void> {
       if (!filePath) break;
       const volume = (actionData.volume as number) ?? 1;
       const loop = (actionData.loop as boolean) ?? false;
-      toggleClip(button.id, filePath, volume, loop);
+      await toggleClip(button.id, filePath, volume, loop);
       break;
     }
 

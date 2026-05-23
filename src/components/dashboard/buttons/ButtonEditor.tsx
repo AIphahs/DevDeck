@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Plus, Trash2, GripVertical, Clock } from "lucide-react";
+import { Plus, Trash2, GripVertical, Clock, FolderOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
 import { HotkeyRecorder } from "@/components/shared/HotkeyRecorder";
+import { pickAudioFile } from "@/services/tauri/dialog";
 import { cn } from "@/utils/cn";
 import type { Button as ButtonType, ActionType } from "@/types";
 import { generateId } from "@/utils/format";
@@ -267,13 +268,27 @@ export function ButtonEditor({ button, col = 0, row = 0, open, onClose, onSave, 
             <div className="space-y-3">
               <div className="space-y-1.5">
                 <Label>Fichier audio</Label>
-                <Input
-                  value={soundPath}
-                  onChange={(e) => setSoundPath(e.target.value)}
-                  placeholder="C:\sounds\alerte.mp3"
-                  className="font-mono text-xs"
-                />
-                <p className="text-xs text-muted-foreground">Formats supportés : MP3, WAV, OGG, FLAC</p>
+                <div className="flex gap-2">
+                  <Input
+                    value={soundPath}
+                    onChange={(e) => setSoundPath(e.target.value)}
+                    placeholder="C:\sounds\alerte.mp3"
+                    className="font-mono text-xs flex-1"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="shrink-0"
+                    onClick={async () => {
+                      const path = await pickAudioFile();
+                      if (path) setSoundPath(path);
+                    }}
+                  >
+                    <FolderOpen className="h-3.5 w-3.5" />
+                  </Button>
+                </div>
+                <p className="text-xs text-muted-foreground">MP3, WAV, OGG, FLAC, AAC, M4A</p>
               </div>
               <div className="space-y-1.5">
                 <Label>Volume <span className="text-muted-foreground font-normal">({Math.round(soundVolume * 100)}%)</span></Label>

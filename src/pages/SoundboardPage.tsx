@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Plus, Trash2, Square, Play, Volume2, Music2, Loader2 } from "lucide-react";
+import { Plus, Trash2, Square, Play, Volume2, Music2, Loader2, FolderOpen } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,6 +10,7 @@ import { cn } from "@/utils/cn";
 import { useSoundStore } from "@/store/soundStore";
 import { useActiveProfile } from "@/hooks/useActiveProfile";
 import { playClip, stopClip, stopAll, isPlaying, setMasterVolume } from "@/services/audio/soundService";
+import { pickAudioFile } from "@/services/tauri/dialog";
 import type { SoundClip } from "@/types";
 
 const CLIP_COLORS = [
@@ -101,7 +102,7 @@ export function SoundboardPage() {
     if (isPlaying(clip.id)) {
       stopClip(clip.id);
     } else {
-      playClip(clip.id, clip.filePath, clip.volume * masterVolume, clip.loopMode);
+      void playClip(clip.id, clip.filePath, clip.volume * masterVolume, clip.loopMode);
     }
   }
 
@@ -226,14 +227,29 @@ export function SoundboardPage() {
             </div>
 
             <div className="space-y-1.5">
-              <Label>Chemin du fichier</Label>
-              <Input
-                value={formPath}
-                onChange={(e) => setFormPath(e.target.value)}
-                placeholder="C:\sounds\alerte.mp3"
-                className="font-mono text-xs"
-              />
-              <p className="text-xs text-muted-foreground">MP3, WAV, OGG, FLAC</p>
+              <Label>Fichier audio</Label>
+              <div className="flex gap-2">
+                <Input
+                  value={formPath}
+                  onChange={(e) => setFormPath(e.target.value)}
+                  placeholder="C:\sounds\alerte.mp3"
+                  className="font-mono text-xs flex-1"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="shrink-0 gap-1.5"
+                  onClick={async () => {
+                    const path = await pickAudioFile();
+                    if (path) setFormPath(path);
+                  }}
+                >
+                  <FolderOpen className="h-3.5 w-3.5" />
+                  Parcourir
+                </Button>
+              </div>
+              <p className="text-xs text-muted-foreground">MP3, WAV, OGG, FLAC, AAC, M4A</p>
             </div>
 
             <div className="space-y-1.5">

@@ -9,6 +9,10 @@
     "os:default",
     "process:default",
     "global-shortcut:default",
-    "store:default"
+    "store:default",
+    "dialog:allow-open",
+    "core:window:allow-minimize",
+    "core:window:allow-close",
+    "core:window:allow-toggle-maximize"
   ]
 }

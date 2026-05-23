@@ -34,3 +34,13 @@ pub async fn play_sound(_path: String, _device: Option<String>) -> Result<(), St
     // This command handles routing to non-default output devices via CPAL.
     Ok(())
 }
+
+/// Reads a local audio file and returns its content as a base64-encoded string.
+/// Used by the frontend to create a data URL that Howler.js can load directly,
+/// bypassing the asset protocol which requires extra Tauri configuration.
+#[tauri::command]
+pub async fn read_audio_base64(path: String) -> Result<String, String> {
+    use base64::{Engine as _, engine::general_purpose::STANDARD};
+    let data = std::fs::read(&path).map_err(|e| format!("Cannot read \"{path}\": {e}"))?;
+    Ok(STANDARD.encode(&data))
+}

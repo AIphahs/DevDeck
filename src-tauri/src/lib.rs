@@ -11,6 +11,7 @@ pub fn run() {
         .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_store::Builder::default().build())
+        .plugin(tauri_plugin_dialog::init())
         .setup(|app| {
             #[cfg(debug_assertions)]
             {
@@ -27,6 +28,7 @@ pub fn run() {
             commands::shell::execute_script,
             commands::audio::get_audio_devices,
             commands::audio::play_sound,
+            commands::audio::read_audio_base64,
             commands::automation::register_shortcut,
             commands::automation::unregister_shortcut,
         ])
