@@ -118,7 +118,7 @@ export function ButtonGrid() {
   const buttonIds = currentPage?.buttons.map((b) => b.id) ?? [];
 
   return (
-    <div className="flex h-full flex-col gap-4 p-6">
+    <div className="flex h-full min-h-0 flex-col gap-3 p-4 overflow-hidden">
       {/* Toolbar */}
       <div className="flex items-center justify-between">
         <div>
@@ -139,7 +139,7 @@ export function ButtonGrid() {
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <SortableContext items={buttonIds} strategy={rectSortingStrategy}>
           <div
-            className="flex-1 grid gap-2"
+            className="flex-1 min-h-0 grid gap-2"
             style={{
               gridTemplateColumns: `repeat(${COLS}, 1fr)`,
               gridTemplateRows: `repeat(${ROWS}, 1fr)`,
@@ -159,7 +159,7 @@ export function ButtonGrid() {
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0, scale: 0.9 }}
                       transition={{ duration: 0.15 }}
-                      className="aspect-square"
+                      className="h-full w-full"
                     >
                       <ButtonCard
                         button={btn}
@@ -172,7 +172,7 @@ export function ButtonGrid() {
                       key={`empty-${col}-${row}`}
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
-                      className="aspect-square"
+                      className="h-full w-full"
                     >
                       <EmptySlot col={col} row={row} isEditing={isEditing} onAdd={handleAddButton} />
                     </motion.div>
