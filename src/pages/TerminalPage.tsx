@@ -1,8 +1,15 @@
 import { useCallback, useEffect, useRef, useState, KeyboardEvent } from "react";
+import { createPortal } from "react-dom";
 import { useTerminalStore, ShellType, TerminalSession, TerminalLine } from "@/store/terminalStore";
 import { executeCommand } from "@/services/tauri/shell";
 import { cn } from "@/utils/cn";
-import { Plus, X, Trash2, ChevronRight, Terminal } from "lucide-react";
+import { Plus, X, Trash2, ChevronRight, ChevronDown } from "lucide-react";
+
+const SHELLS: { value: ShellType; label: string }[] = [
+  { value: "powershell", label: "PowerShell" },
+  { value: "cmd", label: "CMD" },
+  { value: "bash", label: "Bash" },
+];
 
 const CWD_REGEX = /##CWD##(.+?)##/;
 
@@ -19,47 +26,101 @@ function wrapCommand(shell: ShellType, cwd: string, cmd: string): string {
 
 export function TerminalPage() {
   const { sessions, activeId, addSession, removeSession, setActive } = useTerminalStore();
+  const [shellMenuOpen, setShellMenuOpen] = useState(false);
+  const [menuPos, setMenuPos] = useState<{ top: number; left: number } | null>(null);
+  const addBtnRef = useRef<HTMLButtonElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (sessions.length === 0) addSession("powershell");
   }, []);
+
+  useEffect(() => {
+    if (!shellMenuOpen) return;
+    function onClose(e: MouseEvent) {
+      const target = e.target as Node;
+      const inBtn = addBtnRef.current?.contains(target);
+      const inMenu = menuRef.current?.contains(target);
+      if (!inBtn && !inMenu) setShellMenuOpen(false);
+    }
+    document.addEventListener("mousedown", onClose);
+    return () => document.removeEventListener("mousedown", onClose);
+  }, [shellMenuOpen]);
+
+  const MENU_WIDTH = 130;
+
+  function toggleShellMenu() {
+    if (!shellMenuOpen && addBtnRef.current) {
+      const r = addBtnRef.current.getBoundingClientRect();
+      const left = Math.min(r.left, window.innerWidth - MENU_WIDTH - 8);
+      setMenuPos({ top: r.bottom + 4, left });
+      setShellMenuOpen(true);
+    } else {
+      setShellMenuOpen(false);
+    }
+  }
 
   const active = sessions.find((s) => s.id === activeId);
 
   return (
     <div className="flex flex-col h-full bg-[#0d0d0d] text-sm">
       {/* Tab bar */}
-      <div className="flex items-center gap-0.5 px-2 pt-2 border-b border-border bg-card shrink-0 overflow-x-auto">
-        {sessions.map((sess) => (
-          <button
-            key={sess.id}
-            onClick={() => setActive(sess.id)}
-            className={cn(
-              "flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-t border border-b-0 shrink-0 transition-colors",
-              sess.id === activeId
-                ? "bg-[#0d0d0d] border-border text-foreground"
-                : "border-transparent text-muted-foreground hover:text-foreground hover:bg-accent/30"
-            )}
-          >
-            <Terminal className="h-3 w-3" />
-            <span>{sess.name}</span>
-            <span
-              role="button"
-              onClick={(e) => { e.stopPropagation(); removeSession(sess.id); }}
-              className="ml-1 rounded p-0.5 hover:bg-muted-foreground/20"
+      <div className="flex items-center border-b border-border bg-card shrink-0">
+        <div className="flex items-center gap-0.5 px-2 pt-2 flex-1 overflow-x-auto">
+          {sessions.map((sess) => (
+            <button
+              key={sess.id}
+              onClick={() => setActive(sess.id)}
+              className={cn(
+                "flex items-center gap-1 px-2 py-1 text-xs rounded-t border border-b-0 shrink-0 transition-colors font-mono",
+                sess.id === activeId
+                  ? "bg-[#0d0d0d] border-border text-foreground"
+                  : "border-transparent text-muted-foreground hover:text-foreground hover:bg-accent/30"
+              )}
             >
-              <X className="h-2.5 w-2.5" />
-            </span>
-          </button>
-        ))}
+              <span>{sess.name}</span>
+              <span
+                role="button"
+                onClick={(e) => { e.stopPropagation(); removeSession(sess.id); }}
+                className="rounded p-0.5 hover:bg-muted-foreground/20"
+              >
+                <X className="h-2.5 w-2.5" />
+              </span>
+            </button>
+          ))}
+        </div>
+
+        {/* New session button — outside overflow container so portal aligns correctly */}
         <button
-          onClick={() => addSession("powershell")}
-          className="flex items-center gap-1 px-2 py-1.5 text-xs text-muted-foreground hover:text-foreground rounded-t transition-colors shrink-0"
+          ref={addBtnRef}
+          onClick={toggleShellMenu}
+          className="flex items-center gap-0.5 px-2 py-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors shrink-0 mr-1"
           title="Nouvelle session"
         >
           <Plus className="h-3 w-3" />
+          <ChevronDown className="h-2.5 w-2.5" />
         </button>
       </div>
+
+      {/* Shell picker portal — rendered at body level to escape all stacking contexts */}
+      {shellMenuOpen && menuPos && createPortal(
+        <div
+          ref={menuRef}
+          style={{ position: "fixed", top: menuPos.top, left: menuPos.left, zIndex: 9999 }}
+          className="min-w-[130px] rounded-md border border-border bg-card shadow-xl py-1"
+        >
+          {SHELLS.map((s) => (
+            <button
+              key={s.value}
+              onClick={() => { addSession(s.value); setShellMenuOpen(false); }}
+              className="w-full text-left px-3 py-1.5 text-xs text-foreground hover:bg-accent transition-colors"
+            >
+              {s.label}
+            </button>
+          ))}
+        </div>,
+        document.body
+      )}
 
       {active ? (
         <TerminalBody key={active.id} session={active} />

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Plus, Trash2, Square, Play, Volume2, Music2, Loader2, FolderOpen } from "lucide-react";
+import { Plus, Trash2, Square, Play, Volume2, Music2, FolderOpen } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -341,10 +341,10 @@ function SoundPad({
       >
         {playing ? (
           <motion.div
-            animate={{ scale: [1, 1.2, 1] }}
-            transition={{ repeat: Infinity, duration: 0.8, ease: "easeInOut" }}
+            animate={{ scale: [1, 1.15, 1] }}
+            transition={{ repeat: Infinity, duration: 1, ease: "easeInOut" }}
           >
-            <Loader2 className="h-6 w-6 text-white animate-spin" />
+            <Volume2 className="h-6 w-6 text-white" />
           </motion.div>
         ) : (
           <Play className="h-6 w-6 text-white" />

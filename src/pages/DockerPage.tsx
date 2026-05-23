@@ -52,7 +52,7 @@ export function DockerPage() {
           <span className="font-semibold text-sm">Docker</span>
           {containersQ.data && (
             <Badge variant="secondary" className="text-xs">
-              {containersQ.data.filter((c) => c.state === "running").length} running
+              {containersQ.data.filter((c) => c.state === "running").length} en cours
             </Badge>
           )}
         </div>
@@ -168,6 +168,13 @@ export function DockerPage() {
   );
 }
 
+const STATE_LABELS: Record<string, string> = {
+  running: "en cours",
+  exited: "arrêté",
+  paused: "pausé",
+  other: "inconnu",
+};
+
 function StateIndicator({ state }: { state: DockerContainer["state"] }) {
   return (
     <span
@@ -188,7 +195,7 @@ function StateIndicator({ state }: { state: DockerContainer["state"] }) {
           state === "other" && "bg-muted-foreground"
         )}
       />
-      {state}
+      {STATE_LABELS[state] ?? state}
     </span>
   );
 }
@@ -218,7 +225,7 @@ function ContainerRow({
       </div>
       <div className="flex items-center gap-1 shrink-0">
         <Button
-          size="sm" variant="ghost" className="h-7 w-7 p-0" title="Logs"
+          size="sm" variant="ghost" className="h-7 w-7 p-0" title="Journaux"
           onClick={onLogs} disabled={isActing}
         >
           <FileText className="h-3.5 w-3.5" />
@@ -226,21 +233,21 @@ function ContainerRow({
         {container.state === "running" ? (
           <Button
             size="sm" variant="ghost" className="h-7 w-7 p-0 text-yellow-400 hover:text-yellow-300"
-            title="Stop" onClick={() => onAction("stop")} disabled={isActing}
+            title="Arrêter" onClick={() => onAction("stop")} disabled={isActing}
           >
             <Square className="h-3.5 w-3.5" />
           </Button>
         ) : (
           <Button
             size="sm" variant="ghost" className="h-7 w-7 p-0 text-emerald-400 hover:text-emerald-300"
-            title="Start" onClick={() => onAction("start")} disabled={isActing}
+            title="Démarrer" onClick={() => onAction("start")} disabled={isActing}
           >
             <Play className="h-3.5 w-3.5" />
           </Button>
         )}
         <Button
           size="sm" variant="ghost" className="h-7 w-7 p-0 text-destructive/60 hover:text-destructive"
-          title="Remove" onClick={() => onAction("remove")} disabled={isActing}
+          title="Supprimer" onClick={() => onAction("remove")} disabled={isActing}
         >
           <Trash2 className="h-3.5 w-3.5" />
         </Button>

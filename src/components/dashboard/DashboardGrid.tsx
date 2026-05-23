@@ -63,31 +63,34 @@ export function DashboardGrid() {
         </div>
       </div>
 
-      {/* Grid */}
-      <div className="flex-1 min-h-0 overflow-y-auto">
-        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-          <SortableContext items={widgets.map((w) => w.id)} strategy={rectSortingStrategy}>
-            <div
-              className="grid gap-3"
-              style={{
-                gridTemplateColumns: `repeat(${GRID_COLS}, minmax(0, 1fr))`,
-                gridAutoRows: "minmax(90px, auto)",
-              }}
-            >
-              {widgets.map((widget) => (
-                <WidgetCard key={widget.id} widget={widget} isEditing={isEditing} />
-              ))}
-            </div>
-          </SortableContext>
-        </DndContext>
+      {/* Empty state */}
+      {widgets.length === 0 && (
+        <div className="flex flex-1 flex-col items-center justify-center gap-3 text-muted-foreground">
+          <p className="text-sm">Aucun widget — ajoutez-en un pour commencer.</p>
+          <AddWidgetMenu />
+        </div>
+      )}
 
-        {widgets.length === 0 && (
-          <div className="flex h-full flex-col items-center justify-center gap-3 text-muted-foreground">
-            <p className="text-sm">Aucun widget — ajoutez-en un pour commencer.</p>
-            <AddWidgetMenu />
-          </div>
-        )}
-      </div>
+      {/* Grid */}
+      {widgets.length > 0 && (
+        <div className="flex-1 min-h-0 overflow-y-auto">
+          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+            <SortableContext items={widgets.map((w) => w.id)} strategy={rectSortingStrategy}>
+              <div
+                className="grid gap-3"
+                style={{
+                  gridTemplateColumns: `repeat(${GRID_COLS}, minmax(0, 1fr))`,
+                  gridAutoRows: "minmax(90px, auto)",
+                }}
+              >
+                {widgets.map((widget) => (
+                  <WidgetCard key={widget.id} widget={widget} isEditing={isEditing} />
+                ))}
+              </div>
+            </SortableContext>
+          </DndContext>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import { useState, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { gitStatus, gitLog, gitBranches, gitRun } from "@/services/tauri/git";
+import { pickFolder } from "@/services/tauri/dialog";
 import { cn } from "@/utils/cn";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -73,7 +74,6 @@ export function GitPage() {
     <div className="flex flex-col h-full overflow-hidden">
       {/* Header */}
       <div className="flex items-center gap-2 px-6 py-3 border-b border-border bg-card shrink-0">
-        <FolderOpen className="h-4 w-4 text-muted-foreground shrink-0" />
         <Input
           value={inputPath}
           onChange={(e) => setInputPath(e.target.value)}
@@ -81,6 +81,18 @@ export function GitPage() {
           placeholder="Chemin du dépôt (ex: C:\Projects\mon-projet)"
           className="flex-1 h-8 text-sm font-mono"
         />
+        <Button
+          size="sm"
+          variant="outline"
+          className="h-8 w-8 p-0 shrink-0"
+          title="Parcourir"
+          onClick={async () => {
+            const folder = await pickFolder();
+            if (folder) { setInputPath(folder); setRepoPath(folder); setActionResult(null); }
+          }}
+        >
+          <FolderOpen className="h-3.5 w-3.5" />
+        </Button>
         <Button size="sm" onClick={load} className="h-8 shrink-0">
           Ouvrir
         </Button>
@@ -223,8 +235,8 @@ export function GitPage() {
                     >
                       <GitBranch className={cn("h-3.5 w-3.5 shrink-0", b.isCurrent ? "text-primary" : "text-muted-foreground")} />
                       <span className={cn("font-mono", b.isCurrent && "text-primary font-medium")}>{b.name}</span>
-                      {b.isCurrent && <Badge variant="outline" className="text-[10px] px-1.5 py-0">current</Badge>}
-                      {b.isRemote && <Badge variant="secondary" className="text-[10px] px-1.5 py-0">remote</Badge>}
+                      {b.isCurrent && <Badge variant="outline" className="text-[10px] px-1.5 py-0">actuelle</Badge>}
+                      {b.isRemote && <Badge variant="secondary" className="text-[10px] px-1.5 py-0">distante</Badge>}
                     </div>
                   ))}
                 </div>

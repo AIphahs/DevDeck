@@ -23,7 +23,7 @@ const NAV_ITEMS = [
   { id: "docker", label: "Docker", icon: Container },
   { id: "soundboard", label: "Soundboard", icon: Music2 },
   { id: "monitoring", label: "Monitoring", icon: Activity },
-  { id: "ai", label: "AI Assistant", icon: Bot },
+  { id: "ai", label: "Assistant IA", icon: Bot },
   { id: "plugins", label: "Plugins", icon: Puzzle },
 ] as const;
 
@@ -79,7 +79,7 @@ export function Sidebar() {
       <div className="border-t border-border p-2 space-y-1">
         <button
           onClick={() => setActivePanel("settings")}
-          title={isSidebarCollapsed ? "Settings" : undefined}
+          title={isSidebarCollapsed ? "Paramètres" : undefined}
           className={cn(
             "no-drag flex w-full items-center gap-3 rounded-md px-2 py-2 text-sm transition-colors",
             activePanel === "settings"
@@ -88,7 +88,7 @@ export function Sidebar() {
           )}
         >
           <Settings className="h-4 w-4 shrink-0" />
-          {!isSidebarCollapsed && <span>Settings</span>}
+          {!isSidebarCollapsed && <span>Paramètres</span>}
         </button>
 
         <button
@@ -98,7 +98,7 @@ export function Sidebar() {
           <ChevronLeft
             className={cn("h-4 w-4 shrink-0 transition-transform", isSidebarCollapsed && "rotate-180")}
           />
-          {!isSidebarCollapsed && <span>Collapse</span>}
+          {!isSidebarCollapsed && <span>Réduire</span>}
         </button>
       </div>
     </aside>

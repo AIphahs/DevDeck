@@ -30,7 +30,6 @@ export function DockerStatusWidget() {
   }
 
   const running = data.filter((c) => c.state === "running");
-  const stopped = data.filter((c) => c.state !== "running");
 
   return (
     <div className="flex flex-col h-full gap-2">

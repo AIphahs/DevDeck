@@ -33,10 +33,16 @@ interface TerminalState {
   clearLines: (id: string) => void;
 }
 
+const SHELL_LABEL: Record<ShellType, string> = {
+  powershell: "PS",
+  cmd: "CMD",
+  bash: "bash",
+};
+
 function makeSession(shell: ShellType, n: number): TerminalSession {
   return {
     id: generateId(),
-    name: `Session ${n}`,
+    name: `${SHELL_LABEL[shell]} ${n}`,
     shell,
     workingDir: "~",
     lines: [],
