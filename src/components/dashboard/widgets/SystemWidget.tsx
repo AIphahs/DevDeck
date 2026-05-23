@@ -25,9 +25,9 @@ export function SystemWidget({ type }: Props) {
       <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{label}</span>
 
       <div className="space-y-1">
-        <div className="flex items-end justify-between">
-          <span className="text-2xl font-bold tabular-nums">{formatPercent(pct)}</span>
-          {detail && <span className="text-xs text-muted-foreground">{detail}</span>}
+        <div className="flex items-end justify-between gap-1 min-w-0">
+          <span className="text-xl font-bold tabular-nums shrink-0">{formatPercent(pct)}</span>
+          {detail && <span className="text-[10px] text-muted-foreground truncate text-right">{detail}</span>}
         </div>
 
         {/* Progress bar */}

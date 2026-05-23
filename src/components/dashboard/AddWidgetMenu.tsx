@@ -1,15 +1,19 @@
 import { useState } from "react";
-import { Plus, Clock, Cpu, HardDrive, MemoryStick } from "lucide-react";
+import { Plus, Clock, Cpu, HardDrive, MemoryStick, GitBranch, Container, StickyNote, Music2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useWidgetStore } from "@/store/widgetStore";
 import type { WidgetType } from "@/types";
 
 const WIDGET_CATALOG: { type: WidgetType; label: string; icon: React.ReactNode; colSpan: number; rowSpan: number }[] = [
-  { type: "clock", label: "Clock", icon: <Clock className="h-5 w-5" />, colSpan: 2, rowSpan: 1 },
-  { type: "cpu-monitor", label: "CPU Monitor", icon: <Cpu className="h-5 w-5" />, colSpan: 2, rowSpan: 1 },
-  { type: "ram-monitor", label: "RAM Monitor", icon: <MemoryStick className="h-5 w-5" />, colSpan: 2, rowSpan: 1 },
-  { type: "disk-monitor", label: "Disk Monitor", icon: <HardDrive className="h-5 w-5" />, colSpan: 2, rowSpan: 1 },
+  { type: "clock", label: "Horloge", icon: <Clock className="h-5 w-5" />, colSpan: 2, rowSpan: 1 },
+  { type: "cpu-monitor", label: "CPU", icon: <Cpu className="h-5 w-5" />, colSpan: 2, rowSpan: 1 },
+  { type: "ram-monitor", label: "Mémoire RAM", icon: <MemoryStick className="h-5 w-5" />, colSpan: 2, rowSpan: 1 },
+  { type: "disk-monitor", label: "Disque", icon: <HardDrive className="h-5 w-5" />, colSpan: 2, rowSpan: 1 },
+  { type: "git-status", label: "Statut Git", icon: <GitBranch className="h-5 w-5" />, colSpan: 3, rowSpan: 1 },
+  { type: "docker-status", label: "Docker", icon: <Container className="h-5 w-5" />, colSpan: 3, rowSpan: 2 },
+  { type: "notes", label: "Notes", icon: <StickyNote className="h-5 w-5" />, colSpan: 3, rowSpan: 2 },
+  { type: "soundboard", label: "Soundboard", icon: <Music2 className="h-5 w-5" />, colSpan: 4, rowSpan: 2 },
 ];
 
 export function AddWidgetMenu() {
@@ -33,12 +37,12 @@ export function AddWidgetMenu() {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button size="sm" variant="outline" className="gap-2">
-          <Plus className="h-4 w-4" /> Add widget
+          <Plus className="h-4 w-4" /> Ajouter widget
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-sm">
         <DialogHeader>
-          <DialogTitle>Add a widget</DialogTitle>
+          <DialogTitle>Ajouter un widget</DialogTitle>
         </DialogHeader>
         <div className="grid grid-cols-2 gap-2 mt-2">
           {WIDGET_CATALOG.map((item) => (

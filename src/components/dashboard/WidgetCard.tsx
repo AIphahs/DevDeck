@@ -35,7 +35,7 @@ export function WidgetCard({ widget, isEditing }: Props) {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       className={cn(
-        "relative rounded-lg border bg-card p-3 transition-all",
+        "relative rounded-lg border bg-card p-3 transition-all overflow-hidden",
         isDragging && "opacity-50 ring-2 ring-primary",
         isEditing && "ring-1 ring-dashed ring-border"
       )}
@@ -69,7 +69,7 @@ export function WidgetCard({ widget, isEditing }: Props) {
       )}
 
       <div className={cn("h-full", widget.title && "pt-4")}>
-        <WidgetRenderer widget={widget} />
+        <WidgetRenderer widget={widget} isEditing={isEditing} />
       </div>
     </div>
   );

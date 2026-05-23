@@ -8,6 +8,7 @@ export type WidgetType =
   | "git-status"
   | "docker-status"
   | "soundboard"
+  | "notes"
   | "terminal-shortcut"
   | "custom";
 

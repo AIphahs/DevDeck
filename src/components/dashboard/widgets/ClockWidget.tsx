@@ -15,8 +15,8 @@ export function ClockWidget() {
 
   return (
     <div className="flex h-full flex-col items-center justify-center gap-1">
-      <div className="font-mono text-3xl font-bold tabular-nums leading-none">
-        {hh}<span className="animate-pulse text-primary">:</span>{mm}<span className="text-muted-foreground text-xl">:{ss}</span>
+      <div className="font-mono text-2xl font-bold tabular-nums leading-none">
+        {hh}<span className="animate-pulse text-primary">:</span>{mm}<span className="text-muted-foreground text-base">:{ss}</span>
       </div>
       <div className="text-xs text-muted-foreground">{date}</div>
     </div>
