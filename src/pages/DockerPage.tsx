@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { dockerContainers, dockerImages, dockerAction, dockerLogs, DockerContainer } from "@/services/tauri/docker";
+import { useT } from "@/hooks/useT";
 import { cn } from "@/utils/cn";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -14,6 +15,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 
 export function DockerPage() {
   const qc = useQueryClient();
+  const t = useT();
   const [logsModal, setLogsModal] = useState<{ name: string; content: string } | null>(null);
 
   const containersQ = useQuery({
@@ -52,7 +54,7 @@ export function DockerPage() {
           <span className="font-semibold text-sm">Docker</span>
           {containersQ.data && (
             <Badge variant="secondary" className="text-xs">
-              {containersQ.data.filter((c) => c.state === "running").length} en cours
+              {containersQ.data.filter((c) => c.state === "running").length} {t.docker.running}
             </Badge>
           )}
         </div>
@@ -75,7 +77,7 @@ export function DockerPage() {
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center space-y-2 text-muted-foreground">
             <AlertCircle className="h-10 w-10 mx-auto opacity-30" />
-            <p className="text-sm font-medium">Docker non disponible</p>
+            <p className="text-sm font-medium">{t.docker.unavailable}</p>
             <p className="text-xs max-w-xs opacity-70">{errorMsg}</p>
           </div>
         </div>
@@ -93,17 +95,17 @@ export function DockerPage() {
         <Tabs defaultValue="containers" className="flex-1 overflow-hidden flex flex-col">
           <TabsList className="mx-6 mt-3 w-fit shrink-0">
             <TabsTrigger value="containers" className="text-xs">
-              Conteneurs ({containersQ.data.length})
+              {t.docker.containers} ({containersQ.data.length})
             </TabsTrigger>
             <TabsTrigger value="images" className="text-xs">
-              Images ({imagesQ.data?.length ?? "…"})
+              {t.docker.images} ({imagesQ.data?.length ?? "…"})
             </TabsTrigger>
           </TabsList>
 
           <TabsContent value="containers" className="flex-1 overflow-hidden mt-0 px-6 pb-4">
             <ScrollArea className="h-full pt-3">
               {containersQ.data.length === 0 ? (
-                <p className="text-sm text-muted-foreground pt-4">Aucun conteneur.</p>
+                <p className="text-sm text-muted-foreground pt-4">{t.docker.noContainers}</p>
               ) : (
                 <div className="space-y-2">
                   {containersQ.data.map((c) => (
@@ -113,6 +115,7 @@ export function DockerPage() {
                       onAction={(action) => actionMut.mutate({ id: c.id, action })}
                       onLogs={() => logsMut.mutate(c)}
                       isActing={actionMut.isPending}
+                      labels={{ ...t.docker }}
                     />
                   ))}
                 </div>
@@ -127,7 +130,7 @@ export function DockerPage() {
                   <Loader2 className="h-4 w-4 animate-spin" /> Chargement…
                 </div>
               ) : (imagesQ.data ?? []).length === 0 ? (
-                <p className="text-sm text-muted-foreground pt-4">Aucune image.</p>
+                <p className="text-sm text-muted-foreground pt-4">{t.docker.noImages}</p>
               ) : (
                 <div className="space-y-1">
                   {(imagesQ.data ?? []).map((img) => (
@@ -168,14 +171,7 @@ export function DockerPage() {
   );
 }
 
-const STATE_LABELS: Record<string, string> = {
-  running: "en cours",
-  exited: "arrêté",
-  paused: "pausé",
-  other: "inconnu",
-};
-
-function StateIndicator({ state }: { state: DockerContainer["state"] }) {
+function StateIndicator({ state, labels }: { state: DockerContainer["state"]; labels: Record<string, string> }) {
   return (
     <span
       className={cn(
@@ -195,18 +191,19 @@ function StateIndicator({ state }: { state: DockerContainer["state"] }) {
           state === "other" && "bg-muted-foreground"
         )}
       />
-      {STATE_LABELS[state] ?? state}
+      {labels[state] ?? state}
     </span>
   );
 }
 
 function ContainerRow({
-  container, onAction, onLogs, isActing,
+  container, onAction, onLogs, isActing, labels,
 }: {
   container: DockerContainer;
   onAction: (a: "start" | "stop" | "remove") => void;
   onLogs: () => void;
   isActing: boolean;
+  labels: Record<string, string>;
 }) {
   return (
     <div className="flex items-center gap-3 px-3 py-3 rounded-lg border border-border/50 hover:border-border bg-card/50 transition-colors">
@@ -214,7 +211,7 @@ function ContainerRow({
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
           <span className="font-mono text-sm font-medium truncate">{container.name}</span>
-          <StateIndicator state={container.state} />
+          <StateIndicator state={container.state} labels={labels} />
         </div>
         <div className="flex items-center gap-2 mt-0.5">
           <span className="text-xs text-muted-foreground truncate">{container.image}</span>
@@ -225,7 +222,7 @@ function ContainerRow({
       </div>
       <div className="flex items-center gap-1 shrink-0">
         <Button
-          size="sm" variant="ghost" className="h-7 w-7 p-0" title="Journaux"
+          size="sm" variant="ghost" className="h-7 w-7 p-0" title={labels.logs}
           onClick={onLogs} disabled={isActing}
         >
           <FileText className="h-3.5 w-3.5" />
@@ -233,21 +230,21 @@ function ContainerRow({
         {container.state === "running" ? (
           <Button
             size="sm" variant="ghost" className="h-7 w-7 p-0 text-yellow-400 hover:text-yellow-300"
-            title="Arrêter" onClick={() => onAction("stop")} disabled={isActing}
+            title={labels.stop} onClick={() => onAction("stop")} disabled={isActing}
           >
             <Square className="h-3.5 w-3.5" />
           </Button>
         ) : (
           <Button
             size="sm" variant="ghost" className="h-7 w-7 p-0 text-emerald-400 hover:text-emerald-300"
-            title="Démarrer" onClick={() => onAction("start")} disabled={isActing}
+            title={labels.start} onClick={() => onAction("start")} disabled={isActing}
           >
             <Play className="h-3.5 w-3.5" />
           </Button>
         )}
         <Button
           size="sm" variant="ghost" className="h-7 w-7 p-0 text-destructive/60 hover:text-destructive"
-          title="Supprimer" onClick={() => onAction("remove")} disabled={isActing}
+          title={labels.remove} onClick={() => onAction("remove")} disabled={isActing}
         >
           <Trash2 className="h-3.5 w-3.5" />
         </Button>

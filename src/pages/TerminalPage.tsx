@@ -4,6 +4,7 @@ import { useTerminalStore, ShellType, TerminalSession, TerminalLine } from "@/st
 import { executeCommand } from "@/services/tauri/shell";
 import { cn } from "@/utils/cn";
 import { Plus, X, Trash2, ChevronRight, ChevronDown } from "lucide-react";
+import { useT } from "@/hooks/useT";
 
 const SHELLS: { value: ShellType; label: string }[] = [
   { value: "powershell", label: "PowerShell" },
@@ -30,6 +31,7 @@ export function TerminalPage() {
   const [menuPos, setMenuPos] = useState<{ top: number; left: number } | null>(null);
   const addBtnRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
+  const t = useT();
 
   useEffect(() => {
     if (sessions.length === 0) addSession("powershell");
@@ -95,7 +97,7 @@ export function TerminalPage() {
           ref={addBtnRef}
           onClick={toggleShellMenu}
           className="flex items-center gap-0.5 px-2 py-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors shrink-0 mr-1"
-          title="Nouvelle session"
+          title={t.terminal.newSession}
         >
           <Plus className="h-3 w-3" />
           <ChevronDown className="h-2.5 w-2.5" />
@@ -126,7 +128,7 @@ export function TerminalPage() {
         <TerminalBody key={active.id} session={active} />
       ) : (
         <div className="flex-1 flex items-center justify-center text-muted-foreground">
-          Aucune session — cliquez sur + pour en créer une.
+          {t.terminal.noSession}
         </div>
       )}
     </div>
@@ -138,6 +140,7 @@ function TerminalBody({ session }: { session: TerminalSession }) {
   const [histIdx, setHistIdx] = useState(-1);
   const outputRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const t = useT();
 
   useEffect(() => {
     const el = outputRef.current;
@@ -159,7 +162,7 @@ function TerminalBody({ session }: { session: TerminalSession }) {
         if (dir) setWorkingDir(session.id, dir);
         appendLine(session.id, {
           type: "info",
-          content: `DevDeck Terminal [${session.shell}]  —  Ctrl+L pour effacer`,
+          content: `DevDeck Terminal [${session.shell}]  —  ${t.terminal.info}`,
         });
       })
       .catch(() => {
@@ -267,7 +270,7 @@ function TerminalBody({ session }: { session: TerminalSession }) {
         <button
           onClick={() => useTerminalStore.getState().clearLines(session.id)}
           className="text-muted-foreground/40 hover:text-muted-foreground transition-colors"
-          title="Effacer (Ctrl+L)"
+          title={t.terminal.clear}
         >
           <Trash2 className="h-3.5 w-3.5" />
         </button>

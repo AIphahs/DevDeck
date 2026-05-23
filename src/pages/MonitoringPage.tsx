@@ -6,6 +6,7 @@ import { cn } from "@/utils/cn";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { RefreshCw, Cpu, MemoryStick, HardDrive, Monitor, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useT } from "@/hooks/useT";
 
 function pct(used: number, total: number) {
   return total > 0 ? Math.round((used / total) * 100) : 0;
@@ -65,6 +66,7 @@ export function MonitoringPage() {
   const sys = systemQ.data;
   const processes = processesQ.data ?? [];
   const isLoading = systemQ.isLoading && !sys;
+  const t = useT();
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
@@ -72,7 +74,7 @@ export function MonitoringPage() {
       <div className="flex items-center justify-between px-6 py-3 border-b border-border bg-card shrink-0">
         <div className="flex items-center gap-2">
           <Monitor className="h-4 w-4 text-primary" />
-          <span className="font-semibold text-sm">Monitoring</span>
+          <span className="font-semibold text-sm">{t.monitoring.title}</span>
           {sys && (
             <span className="text-xs text-muted-foreground">
               {sys.hostname} — {sys.osName}
@@ -136,7 +138,7 @@ export function MonitoringPage() {
             {/* Process table */}
             <div>
               <div className="flex items-center justify-between mb-3">
-                <p className="text-sm font-medium">Processus (top 50 par CPU)</p>
+                <p className="text-sm font-medium">{t.monitoring.processes}</p>
                 {processesQ.isFetching && (
                   <RefreshCw className="h-3 w-3 animate-spin text-muted-foreground" />
                 )}
@@ -145,10 +147,10 @@ export function MonitoringPage() {
                 <table className="w-full text-xs">
                   <thead>
                     <tr className="bg-muted/50 border-b border-border">
-                      <th className="text-left px-3 py-2 text-muted-foreground font-medium">Nom</th>
-                      <th className="text-right px-3 py-2 text-muted-foreground font-medium w-16">PID</th>
-                      <th className="text-right px-3 py-2 text-muted-foreground font-medium w-20">CPU</th>
-                      <th className="text-right px-3 py-2 text-muted-foreground font-medium w-24">Mémoire</th>
+                      <th className="text-left px-3 py-2 text-muted-foreground font-medium">{t.monitoring.name}</th>
+                      <th className="text-right px-3 py-2 text-muted-foreground font-medium w-16">{t.monitoring.pid}</th>
+                      <th className="text-right px-3 py-2 text-muted-foreground font-medium w-20">{t.monitoring.cpu}</th>
+                      <th className="text-right px-3 py-2 text-muted-foreground font-medium w-24">{t.monitoring.memory}</th>
                     </tr>
                   </thead>
                   <tbody>

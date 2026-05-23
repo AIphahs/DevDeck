@@ -14,6 +14,7 @@ const SortableContext = _SortableContext as unknown as FC<{ items: (string | num
 import { Pencil, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useWidgetStore } from "@/store/widgetStore";
+import { useT } from "@/hooks/useT";
 import { WidgetCard } from "./WidgetCard";
 import { AddWidgetMenu } from "./AddWidgetMenu";
 
@@ -22,6 +23,7 @@ const GRID_COLS = 8;
 export function DashboardGrid() {
   const { widgets, reorderWidgets } = useWidgetStore();
   const [isEditing, setIsEditing] = useState(false);
+  const t = useT();
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } })
@@ -43,8 +45,8 @@ export function DashboardGrid() {
       {/* Toolbar */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-semibold">Dashboard</h1>
-          <p className="text-sm text-muted-foreground">Vue d'ensemble de votre DevDeck</p>
+          <h1 className="text-xl font-semibold">{t.dashboard.title}</h1>
+          <p className="text-sm text-muted-foreground">{t.dashboard.subtitle}</p>
         </div>
         <div className="flex items-center gap-2">
           {isEditing && <AddWidgetMenu />}
@@ -55,9 +57,9 @@ export function DashboardGrid() {
             className="gap-2"
           >
             {isEditing ? (
-              <><Check className="h-4 w-4" /> Terminé</>
+              <><Check className="h-4 w-4" /> {t.dashboard.done}</>
             ) : (
-              <><Pencil className="h-4 w-4" /> Modifier</>
+              <><Pencil className="h-4 w-4" /> {t.dashboard.edit}</>
             )}
           </Button>
         </div>
@@ -66,7 +68,7 @@ export function DashboardGrid() {
       {/* Empty state */}
       {widgets.length === 0 && (
         <div className="flex flex-1 flex-col items-center justify-center gap-3 text-muted-foreground">
-          <p className="text-sm">Aucun widget — ajoutez-en un pour commencer.</p>
+          <p className="text-sm">{t.dashboard.empty}</p>
           <AddWidgetMenu />
         </div>
       )}

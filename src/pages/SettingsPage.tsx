@@ -4,13 +4,17 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ThemeSettings } from "@/components/settings/ThemeSettings";
 import { ProfileSettings } from "@/components/settings/ProfileSettings";
 import { ShortcutsSettings } from "@/components/settings/ShortcutsSettings";
+import { LanguageSettings } from "@/components/settings/LanguageSettings";
+import { useT } from "@/hooks/useT";
 import { Info } from "lucide-react";
 
 export function SettingsPage() {
+  const t = useT();
+
   return (
     <div className="flex h-full flex-col">
       <div className="flex items-center gap-3 border-b border-border px-6 py-4">
-        <h1 className="text-xl font-semibold">Paramètres</h1>
+        <h1 className="text-xl font-semibold">{t.settings.title}</h1>
       </div>
 
       <Tabs defaultValue="appearance" className="flex flex-1 overflow-hidden">
@@ -18,16 +22,19 @@ export function SettingsPage() {
         <div className="w-44 shrink-0 border-r border-border p-3">
           <TabsList className="flex h-auto flex-col items-stretch gap-1 bg-transparent p-0">
             <TabsTrigger value="appearance" className="justify-start data-[state=active]:bg-accent">
-              Apparence
+              {t.settings.appearance}
             </TabsTrigger>
             <TabsTrigger value="profiles" className="justify-start data-[state=active]:bg-accent">
-              Profils
+              {t.settings.profiles}
             </TabsTrigger>
             <TabsTrigger value="shortcuts" className="justify-start data-[state=active]:bg-accent">
-              Raccourcis
+              {t.settings.shortcuts}
+            </TabsTrigger>
+            <TabsTrigger value="language" className="justify-start data-[state=active]:bg-accent">
+              {t.settings.language}
             </TabsTrigger>
             <TabsTrigger value="about" className="justify-start data-[state=active]:bg-accent">
-              À propos
+              {t.settings.about}
             </TabsTrigger>
           </TabsList>
         </div>
@@ -47,13 +54,17 @@ export function SettingsPage() {
               <ShortcutsSettings />
             </TabsContent>
 
+            <TabsContent value="language" className="mt-0">
+              <LanguageSettings />
+            </TabsContent>
+
             <TabsContent value="about" className="mt-0">
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
                   <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-primary-foreground font-bold text-xl">D</div>
                   <div>
                     <p className="font-semibold text-lg">DevDeck</p>
-                    <p className="text-sm text-muted-foreground">v0.1.0 — Phase 4</p>
+                    <p className="text-sm text-muted-foreground">v0.1.0 — Phase 5</p>
                   </div>
                 </div>
                 <Separator />

@@ -1,6 +1,7 @@
 import { cn } from "@/utils/cn";
 import { useUIStore } from "@/store/uiStore";
 import { ProfileSelector } from "@/components/shared/ProfileSelector";
+import { useT } from "@/hooks/useT";
 import {
   LayoutDashboard,
   Layers,
@@ -15,20 +16,21 @@ import {
   ChevronLeft,
 } from "lucide-react";
 
-const NAV_ITEMS = [
-  { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { id: "deck", label: "Deck", icon: Layers },
-  { id: "terminal", label: "Terminal", icon: Terminal },
-  { id: "git", label: "Git", icon: GitBranch },
-  { id: "docker", label: "Docker", icon: Container },
-  { id: "soundboard", label: "Soundboard", icon: Music2 },
-  { id: "monitoring", label: "Monitoring", icon: Activity },
-  { id: "ai", label: "Assistant IA", icon: Bot },
-  { id: "plugins", label: "Plugins", icon: Puzzle },
-] as const;
-
 export function Sidebar() {
   const { activePanel, isSidebarCollapsed, setActivePanel, toggleSidebar } = useUIStore();
+  const t = useT();
+
+  const NAV_ITEMS = [
+    { id: "dashboard", label: t.nav.dashboard, icon: LayoutDashboard },
+    { id: "deck", label: t.nav.deck, icon: Layers },
+    { id: "terminal", label: t.nav.terminal, icon: Terminal },
+    { id: "git", label: t.nav.git, icon: GitBranch },
+    { id: "docker", label: t.nav.docker, icon: Container },
+    { id: "soundboard", label: t.nav.soundboard, icon: Music2 },
+    { id: "monitoring", label: t.nav.monitoring, icon: Activity },
+    { id: "ai", label: t.nav.ai, icon: Bot },
+    { id: "plugins", label: t.nav.plugins, icon: Puzzle },
+  ] as const;
 
   return (
     <aside
@@ -79,7 +81,7 @@ export function Sidebar() {
       <div className="border-t border-border p-2 space-y-1">
         <button
           onClick={() => setActivePanel("settings")}
-          title={isSidebarCollapsed ? "Paramètres" : undefined}
+          title={isSidebarCollapsed ? t.nav.settings : undefined}
           className={cn(
             "no-drag flex w-full items-center gap-3 rounded-md px-2 py-2 text-sm transition-colors",
             activePanel === "settings"
@@ -88,7 +90,7 @@ export function Sidebar() {
           )}
         >
           <Settings className="h-4 w-4 shrink-0" />
-          {!isSidebarCollapsed && <span>Paramètres</span>}
+          {!isSidebarCollapsed && <span>{t.nav.settings}</span>}
         </button>
 
         <button
@@ -98,7 +100,7 @@ export function Sidebar() {
           <ChevronLeft
             className={cn("h-4 w-4 shrink-0 transition-transform", isSidebarCollapsed && "rotate-180")}
           />
-          {!isSidebarCollapsed && <span>Réduire</span>}
+          {!isSidebarCollapsed && <span>{t.nav.collapse}</span>}
         </button>
       </div>
     </aside>

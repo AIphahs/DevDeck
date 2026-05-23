@@ -9,6 +9,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/utils/cn";
 import { useSoundStore } from "@/store/soundStore";
 import { useActiveProfile } from "@/hooks/useActiveProfile";
+import { useT } from "@/hooks/useT";
 import { playClip, stopClip, stopAll, isPlaying, setMasterVolume } from "@/services/audio/soundService";
 import { pickAudioFile } from "@/services/tauri/dialog";
 import type { SoundClip } from "@/types";
@@ -21,6 +22,7 @@ const CLIP_COLORS = [
 export function SoundboardPage() {
   const { clips, masterVolume, addClip, updateClip, removeClip, setMasterVolume: storeMasterVolume } = useSoundStore();
   const profile = useActiveProfile();
+  const t = useT();
 
   const [playingIds, setPlayingIds] = useState<Set<string>>(new Set());
   const [editClip, setEditClip] = useState<SoundClip | null>(null);
@@ -122,7 +124,7 @@ export function SoundboardPage() {
       <div className="flex items-center justify-between px-6 py-3 border-b border-border bg-card shrink-0">
         <div className="flex items-center gap-2">
           <Music2 className="h-4 w-4 text-primary" />
-          <span className="font-semibold text-sm">Soundboard</span>
+          <span className="font-semibold text-sm">{t.soundboard.title}</span>
           {profile && (
             <span className="text-xs text-muted-foreground">{profile.name}</span>
           )}
@@ -154,12 +156,12 @@ export function SoundboardPage() {
               onClick={stopAll}
               className="h-7 gap-1.5 text-xs text-destructive hover:text-destructive"
             >
-              <Square className="h-3 w-3" /> Stop all
+              <Square className="h-3 w-3" /> {t.soundboard.stopAll}
             </Button>
           )}
 
           <Button size="sm" onClick={openAdd} className="h-7 gap-1.5 text-xs">
-            <Plus className="h-3.5 w-3.5" /> Ajouter
+            <Plus className="h-3.5 w-3.5" /> {t.soundboard.add}
           </Button>
         </div>
       </div>
@@ -170,11 +172,11 @@ export function SoundboardPage() {
           <div className="flex flex-col items-center justify-center gap-4 py-20 text-muted-foreground">
             <Music2 className="h-10 w-10 opacity-30" />
             <div className="text-center space-y-1">
-              <p className="text-sm">Aucun son configuré.</p>
-              <p className="text-xs opacity-70">Ajoutez des fichiers audio MP3, WAV ou OGG.</p>
+              <p className="text-sm">{t.soundboard.noSound}</p>
+              <p className="text-xs opacity-70">{t.soundboard.noSoundHint}</p>
             </div>
             <Button variant="outline" size="sm" onClick={openAdd} className="gap-1.5">
-              <Plus className="h-4 w-4" /> Ajouter un son
+              <Plus className="h-4 w-4" /> {t.soundboard.addSound}
             </Button>
           </div>
         ) : (
@@ -212,22 +214,22 @@ export function SoundboardPage() {
       <Dialog open={addOpen} onOpenChange={(v) => !v && setAddOpen(false)}>
         <DialogContent className="max-w-sm">
           <DialogHeader>
-            <DialogTitle>{editClip ? "Modifier le son" : "Ajouter un son"}</DialogTitle>
+            <DialogTitle>{editClip ? t.soundboard.editSound : t.soundboard.addSound}</DialogTitle>
           </DialogHeader>
 
           <div className="space-y-4">
             <div className="space-y-1.5">
-              <Label>Nom</Label>
+              <Label>{t.soundboard.name}</Label>
               <Input
                 value={formName}
                 onChange={(e) => setFormName(e.target.value)}
-                placeholder="Alerte, Notification…"
+                placeholder={t.soundboard.namePlaceholder}
                 autoFocus
               />
             </div>
 
             <div className="space-y-1.5">
-              <Label>Fichier audio</Label>
+              <Label>{t.soundboard.file}</Label>
               <div className="flex gap-2">
                 <Input
                   value={formPath}
@@ -246,14 +248,14 @@ export function SoundboardPage() {
                   }}
                 >
                   <FolderOpen className="h-3.5 w-3.5" />
-                  Parcourir
+                  {t.soundboard.browse}
                 </Button>
               </div>
-              <p className="text-xs text-muted-foreground">MP3, WAV, OGG, FLAC, AAC, M4A</p>
+              <p className="text-xs text-muted-foreground">{t.soundboard.formats}</p>
             </div>
 
             <div className="space-y-1.5">
-              <Label>Volume <span className="text-muted-foreground font-normal">({Math.round(formVolume * 100)}%)</span></Label>
+              <Label>{t.soundboard.volume} <span className="text-muted-foreground font-normal">({Math.round(formVolume * 100)}%)</span></Label>
               <input
                 type="range"
                 min={0}
@@ -272,11 +274,11 @@ export function SoundboardPage() {
                 onChange={(e) => setFormLoop(e.target.checked)}
                 className="accent-primary"
               />
-              <span className="text-sm">Lecture en boucle</span>
+              <span className="text-sm">{t.soundboard.loop}</span>
             </label>
 
             <div className="space-y-1.5">
-              <Label>Couleur</Label>
+              <Label>{t.soundboard.color}</Label>
               <div className="flex gap-2 flex-wrap">
                 {CLIP_COLORS.map((c) => (
                   <button
@@ -301,14 +303,14 @@ export function SoundboardPage() {
                 size="sm"
                 onClick={() => { handleDelete(editClip.id); setAddOpen(false); }}
               >
-                Supprimer
+                {t.soundboard.delete}
               </Button>
             )}
             <Button variant="outline" size="sm" onClick={() => setAddOpen(false)}>
-              Annuler
+              {t.soundboard.cancel}
             </Button>
             <Button size="sm" onClick={handleSave} disabled={!formName.trim() || !formPath.trim()}>
-              {editClip ? "Enregistrer" : "Ajouter"}
+              {editClip ? t.soundboard.save : t.soundboard.add}
             </Button>
           </DialogFooter>
         </DialogContent>

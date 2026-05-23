@@ -2,6 +2,7 @@ import { useState, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { gitStatus, gitLog, gitBranches, gitRun } from "@/services/tauri/git";
 import { pickFolder } from "@/services/tauri/dialog";
+import { useT } from "@/hooks/useT";
 import { cn } from "@/utils/cn";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,6 +25,7 @@ export function GitPage() {
   const [repoPath, setRepoPath] = useState("");
   const [actionResult, setActionResult] = useState<ActionResult | null>(null);
   const qc = useQueryClient();
+  const t = useT();
   const repoPathRef = useRef(repoPath);
   repoPathRef.current = repoPath;
 
@@ -78,14 +80,14 @@ export function GitPage() {
           value={inputPath}
           onChange={(e) => setInputPath(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && load()}
-          placeholder="Chemin du dépôt (ex: C:\Projects\mon-projet)"
+          placeholder={t.git.placeholder}
           className="flex-1 h-8 text-sm font-mono"
         />
         <Button
           size="sm"
           variant="outline"
           className="h-8 w-8 p-0 shrink-0"
-          title="Parcourir"
+          title={t.git.browse}
           onClick={async () => {
             const folder = await pickFolder();
             if (folder) { setInputPath(folder); setRepoPath(folder); setActionResult(null); }
@@ -94,7 +96,7 @@ export function GitPage() {
           <FolderOpen className="h-3.5 w-3.5" />
         </Button>
         <Button size="sm" onClick={load} className="h-8 shrink-0">
-          Ouvrir
+          {t.git.open}
         </Button>
         {repoPath && (
           <Button
@@ -114,7 +116,7 @@ export function GitPage() {
         <div className="flex-1 flex items-center justify-center text-muted-foreground">
           <div className="text-center space-y-2">
             <GitBranch className="h-10 w-10 mx-auto opacity-30" />
-            <p className="text-sm">Entrez le chemin d'un dépôt Git</p>
+            <p className="text-sm">{t.git.noRepo}</p>
           </div>
         </div>
       )}
@@ -159,27 +161,27 @@ export function GitPage() {
               onClick={() => runAction.mutate("fetch")}
               disabled={runAction.isPending}
             >
-              <Download className="h-3 w-3" /> Fetch
+              <Download className="h-3 w-3" /> {t.git.fetch}
             </Button>
             <Button
               size="sm" variant="ghost" className="h-7 text-xs gap-1"
               onClick={() => runAction.mutate("pull")}
               disabled={runAction.isPending}
             >
-              <RotateCcw className="h-3 w-3" /> Pull
+              <RotateCcw className="h-3 w-3" /> {t.git.pull}
             </Button>
             <Button
               size="sm" variant="ghost" className="h-7 text-xs gap-1"
               onClick={() => runAction.mutate("push")}
               disabled={runAction.isPending}
             >
-              <Upload className="h-3 w-3" /> Push
+              <Upload className="h-3 w-3" /> {t.git.push}
             </Button>
           </div>
 
           <Tabs defaultValue="status" className="flex-1 overflow-hidden flex flex-col">
             <TabsList className="mx-6 mt-3 w-fit shrink-0">
-              <TabsTrigger value="status" className="text-xs">
+              <TabsTrigger value="status" className="text-xs">{t.git.status}
                 Statut
                 {(statusQ.data.staged.length + statusQ.data.unstaged.length + statusQ.data.untracked.length) > 0 && (
                   <span className="ml-1.5 text-[10px] bg-primary text-primary-foreground rounded-full px-1.5 py-px">
@@ -187,19 +189,19 @@ export function GitPage() {
                   </span>
                 )}
               </TabsTrigger>
-              <TabsTrigger value="log" className="text-xs">Log</TabsTrigger>
-              <TabsTrigger value="branches" className="text-xs">Branches</TabsTrigger>
+              <TabsTrigger value="log" className="text-xs">{t.git.log}</TabsTrigger>
+              <TabsTrigger value="branches" className="text-xs">{t.git.branches}</TabsTrigger>
             </TabsList>
 
             <TabsContent value="status" className="flex-1 overflow-hidden mt-0 px-6 pb-4">
               <ScrollArea className="h-full pt-3">
                 {statusQ.data.staged.length + statusQ.data.unstaged.length + statusQ.data.untracked.length === 0 ? (
-                  <p className="text-sm text-muted-foreground pt-4">Dépôt propre — aucun changement.</p>
+                  <p className="text-sm text-muted-foreground pt-4">{t.git.clean}</p>
                 ) : (
                   <div className="space-y-4">
-                    <FileSection title="Indexés (staged)" files={statusQ.data.staged} color="text-emerald-400" badge="staged" />
-                    <FileSection title="Modifiés" files={statusQ.data.unstaged} color="text-yellow-400" badge="modified" />
-                    <FileSection title="Non suivis" files={statusQ.data.untracked} color="text-muted-foreground" badge="untracked" />
+                    <FileSection title={t.git.staged} files={statusQ.data.staged} color="text-emerald-400" badge="staged" />
+                    <FileSection title={t.git.unstaged} files={statusQ.data.unstaged} color="text-yellow-400" badge="modified" />
+                    <FileSection title={t.git.untracked} files={statusQ.data.untracked} color="text-muted-foreground" badge="untracked" />
                   </div>
                 )}
               </ScrollArea>
@@ -235,8 +237,8 @@ export function GitPage() {
                     >
                       <GitBranch className={cn("h-3.5 w-3.5 shrink-0", b.isCurrent ? "text-primary" : "text-muted-foreground")} />
                       <span className={cn("font-mono", b.isCurrent && "text-primary font-medium")}>{b.name}</span>
-                      {b.isCurrent && <Badge variant="outline" className="text-[10px] px-1.5 py-0">actuelle</Badge>}
-                      {b.isRemote && <Badge variant="secondary" className="text-[10px] px-1.5 py-0">distante</Badge>}
+                      {b.isCurrent && <Badge variant="outline" className="text-[10px] px-1.5 py-0">{t.git.current}</Badge>}
+                      {b.isRemote && <Badge variant="secondary" className="text-[10px] px-1.5 py-0">{t.git.remote}</Badge>}
                     </div>
                   ))}
                 </div>
