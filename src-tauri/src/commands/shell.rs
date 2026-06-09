@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
 use std::process::Stdio;
 use tokio::process::Command;
+use crate::security::permissions::{Permission, PermissionSet};
 
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -26,8 +27,7 @@ pub struct CommandOutput {
     pub exit_code: i32,
 }
 
-#[tauri::command]
-pub async fn execute_command(req: CommandRequest) -> Result<CommandOutput, String> {
+async fn run_command(req: CommandRequest) -> Result<CommandOutput, String> {
     let (program, args) = match req.shell {
         ShellType::PowerShell => ("powershell", vec!["-Command", &req.command]),
         ShellType::Bash => ("bash", vec!["-c", &req.command]),
@@ -53,20 +53,34 @@ pub async fn execute_command(req: CommandRequest) -> Result<CommandOutput, Strin
 }
 
 #[tauri::command]
+pub async fn execute_command(
+    req: CommandRequest,
+    permissions: tauri::State<'_, PermissionSet>,
+) -> Result<CommandOutput, String> {
+    if !permissions.has(&Permission::ExecuteShell) {
+        return Err("Permission denied: ExecuteShell".to_string());
+    }
+    run_command(req).await
+}
+
+#[tauri::command]
 pub async fn execute_script(
     path: String,
     shell: ShellType,
+    permissions: tauri::State<'_, PermissionSet>,
 ) -> Result<CommandOutput, String> {
+    if !permissions.has(&Permission::ExecuteShell) {
+        return Err("Permission denied: ExecuteShell".to_string());
+    }
     let command = match shell {
-        ShellType::PowerShell => format!("& '{}'", path),
-        ShellType::Bash => path.clone(),
-        ShellType::Cmd => path.clone(),
+        // Escape single quotes so a path like /it's/here doesn't break out of the literal
+        ShellType::PowerShell => format!("& '{}'", path.replace('\'', "''")),
+        ShellType::Bash => format!("'{}'", path.replace('\'', "'\\''")),
+        ShellType::Cmd => {
+            // Double-quotes are not valid in Windows paths; strip them to prevent breakout
+            format!("\"{}\"", path.replace('"', ""))
+        }
     };
 
-    execute_command(CommandRequest {
-        shell,
-        command,
-        working_dir: None,
-    })
-    .await
+    run_command(CommandRequest { shell, command, working_dir: None }).await
 }

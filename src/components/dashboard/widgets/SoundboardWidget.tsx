@@ -24,7 +24,7 @@ export function SoundboardWidget() {
       });
     }, 150);
     return () => clearInterval(id);
-  }, [profileClips.length]);
+  }, [profileClips]);
 
   if (profileClips.length === 0) {
     return (

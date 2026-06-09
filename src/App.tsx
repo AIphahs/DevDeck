@@ -10,8 +10,11 @@ export default function App() {
   const { profiles, activeProfileId, addProfile, setActiveProfile } = useProfileStore();
   useShortcuts();
 
-  // Bootstrap a default profile on first launch
+  // Bootstrap a default profile on first launch.
+  // Deps include profiles.length and activeProfileId so we re-run after Zustand rehydrates
+  // from persisted storage (avoids creating a duplicate default profile on async hydration).
   useEffect(() => {
+    if (!useProfileStore.persist.hasHydrated()) return;
     if (profiles.length === 0) {
       const profileId = generateId();
       const pageId = generateId();
@@ -28,7 +31,7 @@ export default function App() {
     } else if (!activeProfileId) {
       setActiveProfile(profiles[0].id);
     }
-  }, []);
+  }, [profiles.length, activeProfileId, addProfile, setActiveProfile]);
 
   useEffect(() => {
     applyAccentColor(accentColor);

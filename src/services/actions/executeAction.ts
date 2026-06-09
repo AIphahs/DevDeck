@@ -51,7 +51,8 @@ interface SimpleStep {
 }
 
 export async function executeAction(button: Button): Promise<void> {
-  const { actionType, actionData } = button;
+  const { actionType } = button;
+  const actionData: Record<string, unknown> = button.actionData ?? {};
 
   switch (actionType) {
     case "command": {
@@ -78,7 +79,9 @@ export async function executeAction(button: Button): Promise<void> {
       const { addEntry, updateEntry } = useOutputStore.getState();
       const id = addEntry({ label: button.label, command: path, stdout: "", stderr: "", exitCode: null, status: "running" });
       try {
-        const output = await executeCommand({ shell: "powershell", command: `Start-Process "${path}"` });
+        // Use -LiteralPath with single-quote escaping to prevent PowerShell injection
+        const escapedPath = path.replace(/'/g, "''");
+        const output = await executeCommand({ shell: "powershell", command: `Start-Process -LiteralPath '${escapedPath}'` });
         updateEntry(id, { stdout: output.stdout, stderr: output.stderr, exitCode: output.exitCode, status: output.exitCode === 0 ? "success" : "error" });
       } catch (err) {
         updateEntry(id, { stderr: String(err), exitCode: -1, status: "error" });
@@ -120,6 +123,8 @@ export async function executeAction(button: Button): Promise<void> {
           step.actionType === "command" ? { command: step.value ?? "", shell: step.shell ?? "powershell" } :
           step.actionType === "url"     ? { url: step.value ?? "" } :
           step.actionType === "app"     ? { path: step.value ?? "" } :
+          step.actionType === "hotkey"  ? { hotkey: step.value ?? "" } :
+          step.actionType === "sound"   ? { soundPath: step.value ?? "" } :
           {}
         );
 

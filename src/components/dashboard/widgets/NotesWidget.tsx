@@ -11,10 +11,10 @@ export function NotesWidget({ widget }: Props) {
   const [text, setText] = useState((widget.config.text as string) ?? "");
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Sync if widget config changes externally
+  // Sync if widget config changes externally (e.g. layout reimport with same widget.id)
   useEffect(() => {
     setText((widget.config.text as string) ?? "");
-  }, [widget.id]);
+  }, [widget.id, widget.config.text]);
 
   function handleChange(value: string) {
     setText(value);

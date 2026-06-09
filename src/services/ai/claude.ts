@@ -1,10 +1,12 @@
 import Anthropic from "@anthropic-ai/sdk";
 
 let client: Anthropic | null = null;
+let activeKey = "";
 
 function getClient(apiKey: string): Anthropic {
-  if (!client) {
+  if (!client || activeKey !== apiKey) {
     client = new Anthropic({ apiKey, dangerouslyAllowBrowser: true });
+    activeKey = apiKey;
   }
   return client;
 }

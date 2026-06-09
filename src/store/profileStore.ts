@@ -42,10 +42,14 @@ export const useProfileStore = create<ProfileState>()(
           })),
 
         deleteProfile: (id) =>
-          set((s) => ({
-            profiles: s.profiles.filter((p) => p.id !== id),
-            activeProfileId: s.activeProfileId === id ? null : s.activeProfileId,
-          })),
+          set((s) => {
+            const remaining = s.profiles.filter((p) => p.id !== id);
+            const nextActiveId =
+              s.activeProfileId === id
+                ? (remaining[0]?.id ?? null)
+                : s.activeProfileId;
+            return { profiles: remaining, activeProfileId: nextActiveId };
+          }),
 
         addPage: (profileId, page) =>
           set((s) => ({
